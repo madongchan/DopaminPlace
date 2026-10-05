@@ -1,0 +1,276 @@
+/* 진행자 화면 — 노트북 본 화면. 정보 밀도를 높게, 오조작을 막게. */
+body { min-height: 100vh; }
+
+/* 로그인 */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.login[hidden] { display: none; }
+.lbox { width: min(420px, 92vw); padding: 36px; display: flex; flex-direction: column; gap: 16px; }
+.lbox .brand { font-size: 24px; text-align: center; }
+.lbox h1 { margin: 0; font-size: 26px; text-align: center; }
+.lbox input {
+  width: 100%; height: 62px; background: var(--bg); border: 2px solid var(--line);
+  border-radius: var(--r); color: var(--text); font-family: var(--font); font-weight: 800;
+  font-size: 28px; text-align: center; letter-spacing: .3em; outline: none;
+}
+.lbox input:focus { border-color: var(--neon); }
+.lbox .hint { margin: 0; font-size: 13px; color: var(--text-dim); text-align: center; font-weight: 600; line-height: 1.6; }
+.lbox code { background: var(--bg); padding: 2px 6px; border-radius: 5px; color: var(--neon-4); }
+
+.brand .b1 { color: var(--neon); }
+.brand .b2 { color: var(--neon-3); }
+
+button {
+  background: var(--neon); color: #0B1026; border: none; border-radius: var(--r-s);
+  font-family: var(--font); font-weight: 900; font-size: 16px; padding: 14px 18px; cursor: pointer;
+}
+button:active { transform: translateY(1px); }
+button:disabled { opacity: .35; cursor: default; }
+button.ghost { background: transparent; color: var(--text-dim); border: 2px solid var(--line); }
+button.danger { background: transparent; color: var(--neon-3); border: 2px solid var(--neon-3); }
+button.sm { font-size: 14px; padding: 10px 14px; }
+button.xs { font-size: 12px; padding: 7px 10px; border-radius: 8px; }
+
+.err { min-height: 20px; font-size: 14px; color: var(--neon-3); text-align: center; }
+
+/* 본 화면 */
+.admin { padding: 20px 24px 40px; max-width: 1500px; margin: 0 auto; }
+.admin[hidden] { display: none; }
+
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px; padding-bottom: 18px; border-bottom: 2px solid var(--line); margin-bottom: 20px;
+}
+header .brand { font-size: 22px; }
+header .tag {
+  font-size: 12px; background: var(--line); color: var(--text-dim);
+  padding: 4px 9px; border-radius: 6px; vertical-align: middle; margin-left: 6px;
+}
+header .meta { font-size: 15px; color: var(--text-dim); font-weight: 700; }
+header .meta b { color: var(--neon); font-size: 20px; letter-spacing: .1em; }
+header .sep { margin: 0 10px; opacity: .4; }
+
+.cols { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .cols { grid-template-columns: 1fr; } }
+
+.pane { padding: 20px; }
+.pane h2 { margin: 0 0 14px; font-size: 19px; }
+.phase { font-size: 13px; color: var(--neon-4); font-weight: 700; margin-left: 8px; }
+
+.rowbtns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+/* 참가자 목록 */
+.list { display: flex; flex-direction: column; gap: 8px; max-height: 60vh; overflow: auto; }
+.prow {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg); border: 2px solid var(--line); border-radius: var(--r-s); padding: 10px 12px;
+}
+.prow .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--neon-2); flex: 0 0 auto; }
+.prow.off .dot { background: var(--text-dim); }
+.prow.off { opacity: .55; }
+.prow .nm { font-size: 17px; flex: 1 1 auto; }
+.prow .tm {
+  font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 6px;
+  border: 2px solid var(--line); color: var(--text-dim);
+}
+.prow .acts { display: flex; gap: 5px; }
+.empty { font-size: 14px; color: var(--text-dim); padding: 20px; text-align: center; }
+
+/* 팀 카드 */
+.teams { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px; }
+@media (max-width: 700px) { .teams { grid-template-columns: 1fr; } }
+.tcard {
+  background: var(--bg); border: 3px solid var(--line); border-radius: var(--r); padding: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.tcard .hd { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.tcard .tn { font-size: 19px; }
+.tcard .tc { font-size: 12px; color: var(--text-dim); font-weight: 700; }
+.tcard .mem { display: flex; flex-direction: column; gap: 5px; }
+.tcard .m {
+  font-size: 14px; display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  padding: 5px 8px; background: var(--bg-2); border-radius: 7px;
+}
+.tcard .m .ld { font-size: 11px; color: var(--neon); }
+.tcard .mv { display: flex; gap: 4px; }
+.tcard .none { font-size: 13px; color: var(--text-dim); padding: 6px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+  background: var(--bg-2); border: 2px solid var(--neon); color: var(--text);
+  font-size: 15px; font-weight: 800; padding: 14px 22px; border-radius: var(--r); z-index: 50;
+  box-shadow: 0 10px 34px rgba(0,0,0,.5); max-width: 90vw;
+}
+.toast[hidden] { display: none; }
+.toast.bad { border-color: var(--neon-3); }
+
+/* ── 3단계: 게임 보드 · 점수판 · 진행 ── */
+.a-라벨 { font-size: 13px; color: var(--text-dim); font-weight: 800; align-self: center; }
+.a-틈 { flex: 1 1 auto; }
+button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt-gold); }
+
+.a-보드 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.a-블록 {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
+  padding: 14px 16px; background: var(--bg); border: 2px solid var(--line);
+  border-radius: var(--r-s); text-align: left; color: var(--text);
+}
+.a-블록:hover:not(:disabled) { background: var(--bg-3); }
+.a-블록:disabled { opacity: .4; cursor: default; }
+.a-블록이름 { font-size: 18px; font-weight: 900; }
+.a-블록메타 { font-size: 12px; color: var(--text-dim); font-weight: 700; }
+.a-블록결과 { font-size: 12px; color: var(--ppt-gold); font-weight: 800; }
+
+.a-점수판 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
+.a-점수칸 h3 { margin: 0 0 10px; font-size: 14px; color: var(--text-dim); }
+.a-점수판 .순위막대 { display: flex; flex-direction: column; gap: 6px; }
+.a-점수판 .순위줄 { display: grid; grid-template-columns: 22px 78px 1fr 46px; align-items: center; gap: 8px; }
+.a-점수판 .순위등수 { font-size: 12px; color: var(--text-dim); text-align: right; }
+.a-점수판 .순위이름 { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.a-점수판 .순위바 { height: 10px; background: var(--bg); border-radius: 999px; overflow: hidden; }
+.a-점수판 .순위바 i { display: block; height: 100%; border-radius: 999px; }
+.a-점수판 .순위점수 { font-size: 14px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* 진행 중인 게임 */
+.pane.game { margin-bottom: 20px; border-color: var(--ppt-gold); }
+.a-규칙 { margin: 0 0 4px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.a-규칙 li { font-size: 14px; line-height: 1.5; }
+.a-g머리 { display: flex; align-items: baseline; gap: 14px; margin-bottom: 12px; }
+.a-g라운드 { font-size: 16px; color: var(--ppt-gold); font-weight: 900; }
+.a-g제시어 { font-size: 20px; font-weight: 900; flex: 1 1 auto; }
+.a-초 { font-size: 26px; color: var(--ppt-gold); font-variant-numeric: tabular-nums; }
+.a-초.급함 { color: var(--coral); }
+
+.a-미제출 { display: flex; gap: 10px; align-items: baseline; margin: 12px 0; font-size: 14px; }
+.a-다냄 { color: var(--ok); font-weight: 800; }
+.a-도움 { font-size: 13px; color: var(--text-dim); margin: 6px 0 10px; }
+
+.a-tp팀 {
+  border: 2px solid var(--line); border-radius: var(--r-s);
+  padding: 10px 12px; margin-bottom: 8px;
+}
+.a-tp머리 { display: flex; justify-content: space-between; font-size: 15px; font-weight: 900; margin-bottom: 8px; }
+.a-tp답들 { display: flex; flex-wrap: wrap; gap: 6px; }
+.a-답칩 {
+  font-size: 13px; padding: 7px 12px; border-radius: 999px;
+  background: var(--bg); border: 2px solid var(--line); color: var(--text); font-weight: 800;
+}
+.a-답칩.최다 { border-color: var(--ppt-gold); color: var(--ppt-gold); }
+.a-답칩.고름 { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt-gold); }
+.a-병합목록 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
+
+/* 제출바 (진행자 크기) */
+.pane .제출바 { display: flex; gap: 8px; }
+.pane .제출칸 { padding: 8px 14px; border-width: 2px; border-radius: var(--r-s); background: var(--bg); }
+.pane .제출팀 { font-size: 14px; }
+.pane .제출수 { font-size: 16px; }
+
+/* 구글시트 동기화 상태 */
+.a-시트 { font-size: 12px; font-weight: 800; align-self: center; }
+.a-시트.좋음 { color: var(--ok); }
+.a-시트.대기 { color: var(--ppt-gold); }
+.a-시트.나쁨 { color: var(--coral); }
+.a-시트.꺼짐 { color: var(--text-dim2); }
+
+/* ══════════════════════════════════════════════════════════
+   5단계 게임 — 진행자
+   대표님은 진행자이면서 참가자다. 버튼은 한 손으로 누를 수 있게 크게.
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 눈치 게임 ─────────────────────────────────────────── */
+.a-nc순서 { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.a-nc칸 {
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--bg-3); border: 1px solid var(--line-2); font-size: 14px;
+}
+.a-nc칸.탈락 { opacity: .5; text-decoration: line-through; }
+.a-nc로그 { margin: 12px 0; }
+.a-nc로그줄 {
+  padding: 5px 0; border-bottom: 1px solid var(--line);
+  font-size: 13px; color: var(--text-dim);
+}
+
+/* ── 반응속도 ──────────────────────────────────────────── */
+.a-rt순위 { margin: 12px 0; }
+.a-rt줄 {
+  display: flex; justify-content: space-between; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+}
+.a-rt줄 b { font-variant-numeric: tabular-nums; }
+
+/* ── 초성 퀴즈 ─────────────────────────────────────────── */
+.a-cs맞힌 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
+.a-cs칩 {
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--bg-3); border: 1px solid var(--line-2); font-size: 13px;
+}
+.a-cs오답 { margin: 12px 0; }
+.a-cs오답줄 {
+  display: grid; grid-template-columns: 1fr 1fr auto;
+  align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+}
+.a-cs오답팀 { color: var(--text-dim); }
+.a-cs오답글 { font-size: 16px; }
+
+/* ── 병뚜껑 던지기 ─────────────────────────────────────── */
+.a-bc판정 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
+.a-bc점 {
+  padding: 22px 0;
+  font-family: var(--font); font-weight: 700; font-size: 26px;
+  color: #1A1204; background: var(--gold);
+  border: none; border-radius: var(--r-s);
+  touch-action: manipulation;
+}
+.a-bc점:active { transform: translateY(2px); }
+.a-bc점.빵 { background: var(--line-2); color: var(--text); }
+.a-bc팀 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0; }
+.a-bc순서 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0; }
+.a-bc순서칸 {
+  padding: 5px 10px; border-radius: 999px;
+  background: var(--bg-3); border: 1px solid var(--line-2); font-size: 13px;
+}
+.a-bc순서칸.끝남 { opacity: .42; }
+.a-bc순서칸.지금 { border-color: var(--gold); color: var(--gold); }
+
+/* ══════════════════════════════════════════════════════════
+   단계형 진행 — ① 입장 받기 → ② 팀 나누기 → ③ 게임 진행
+   지금 할 일 하나와 다음 버튼이 가장 크게 보이게.
+   ══════════════════════════════════════════════════════════ */
+.a-단계바 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+.a-단계바 button {
+  background: var(--bg-2); color: var(--text-dim); border: 2px solid var(--line);
+  font-size: 17px; padding: 14px 10px;
+}
+.a-단계바 button.지남 { color: var(--ok); }
+.a-단계바 button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt-gold); }
+.a-단계바 button:disabled { opacity: 1; }
+.a-단계바 button:disabled:not(.on):not(.지남) { opacity: .4; }
+
+.a-단계 { margin-bottom: 20px; padding: 28px; border-color: var(--ppt-gold); }
+.a-단계 > h2 { font-size: 26px; }
+.a-단계.연습 { border-color: var(--blue); }
+.a-단계.연습 > h2 { color: var(--blue); }
+.a-안내 { margin: 0 0 16px; font-size: 18px; line-height: 1.6; font-weight: 700; }
+.a-안내 b { color: var(--neon); font-size: 24px; letter-spacing: .08em; }
+.a-도움 b { color: var(--text); }
+.a-입장수 { font-size: 20px; font-weight: 800; margin: 18px 0 10px; }
+.a-입장수 b { color: var(--neon); font-size: 34px; }
+.a-이름들 { display: flex; flex-wrap: wrap; gap: 6px; }
+.a-이름칩 {
+  font-size: 15px; font-weight: 800; padding: 6px 12px; border-radius: 999px;
+  background: var(--bg); border: 2px solid var(--line);
+}
+.a-이름칩.끊김 { opacity: .45; }
+.a-큰버튼 { font-size: 22px; padding: 20px 34px; min-width: 280px; }
+.a-큰버튼.둘째 { background: var(--blue); color: #fff; min-width: 0; }
+.a-단계 > .rowbtns { margin-top: 22px; align-items: center; }
+.a-팀요약 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 700px) { .a-팀요약 { grid-template-columns: 1fr; } }
+#pane-score { margin-bottom: 20px; }
+
+/* 고급 · 세부 관리 (접힘) */
+.a-고급 { border-style: dashed; }
+.a-고급 > summary { cursor: pointer; font-size: 17px; font-weight: 900; color: var(--text-dim); }
+.a-고급 > summary span { font-size: 13px; font-weight: 700; margin-left: 10px; color: var(--text-dim2); }
+.a-고급[open] > summary { margin-bottom: 18px; }
+.a-둘째 { margin-top: 26px !important; }

@@ -1,0 +1,114 @@
+/* 도파민플레이션 공통 디자인
+   톤: 극장 암전. 거의 검은 바탕에서 금빛이 차오르는 느낌.
+   TV에서 3~5m 떨어져도 읽히게 본문 최소 28px(큰 화면). */
+:root {
+  /* ── 바탕: 워크숍 PPT의 따뜻한 차콜(#221E1F)을 훨씬 더 눌러 암흑으로 ── */
+  --void:      #050405;   /* 인트로 암흑 */
+  --bg:        #0A0809;
+  --bg-2:      #121011;
+  --bg-3:      #1A1617;
+  --line:      #272122;
+  --line-2:    #362E30;
+
+  --text:      #EEEEEE;   /* 워크숍에서 그대로 가져온 밝은 회백 */
+  --text-dim:  #8A8183;
+  --text-dim2: #5A5355;
+
+  /* ── 강조: 워크숍 머스타드·코랄을 금속으로 변형 ── */
+  --gold:      #E2BE27;   /* 도파민 = 보상. 워크숍 머스타드 그대로가 기준 */
+  --gold-hi:   #F8E695;
+  --gold-lo:   #7A610F;
+  --coral:     #FD8A69;   /* 플레이션 = 과열. 워크숍 살구 */
+  --coral-hi:  #FFC0A8;
+  --coral-lo:  #A82F14;   /* 워크숍 버밀리언(#FC5230)을 눌러 어둡게 */
+  --navy:      #00103D;   /* 배경 광원의 차가운 한 점 */
+  --blue:      #3A5BD9;   /* 워크숍 #0735E6를 눈 아프지 않게 낮춤 — 정보용 */
+  --ok:        #3E9E6B;
+
+  /* ── 워크숍 PPT 1장에서 그대로 가져온 색 (첫 화면 전용) ── */
+  --ppt-gold:  #E2BE27;   /* 유성·줄무늬·제목 바깥 외곽선 */
+  --ppt-navy:  #00103D;   /* 제목 안쪽 외곽선 */
+  --ppt-blue:  #0735E6;   /* 제목 그림자 */
+  --ppt-lime:  #A8E063;   /* 제목 채움 윗부분 */
+
+  /* 예전 이름들을 새 색에 연결해 둔다(다른 화면이 아직 쓰고 있다) */
+  --neon:      var(--gold);
+  --neon-2:    var(--ok);
+  --neon-3:    var(--coral);
+  --neon-4:    var(--blue);
+  --copper:    var(--coral);
+  --copper-hi: var(--coral-hi);
+  --steel:     var(--blue);
+
+  /* 팀 팔레트 (SPEC 2장 — 고정값이라 그대로 둔다) */
+  --team-pink:   #FF3D6E;
+  --team-orange: #FF8A00;
+  --team-yellow: #FFD400;
+  --team-green:  #22C55E;
+  --team-mint:   #14B8C4;
+  --team-blue:   #3B82F6;
+  --team-purple: #8B5CF6;
+  --team-silver: #A3A3A3;
+
+  --r:   16px;
+  --r-s: 10px;
+
+  /* 글꼴: public/fonts/ 의 로컬 글꼴을 먼저 쓰고, 없으면 시스템 글꼴 (SPEC 9장) */
+  --font: 'Dopa Title', 'Dopa Body', 'Pretendard', 'Malgun Gothic', '맑은 고딕',
+          'Apple SD Gothic Neo', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+/* hidden 속성은 display 규칙(grid·flex 등)에 지워지기 쉽다.
+   화면을 숨겼는데 자리를 계속 차지하는 사고를 막으려고 전역으로 못 박는다. */
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: 700;
+  overscroll-behavior: none;
+}
+
+/* 바탕 조명 — 아주 낮게 깔린 금빛. 예전처럼 알록달록하지 않게. */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  background:
+    radial-gradient(1400px 800px at 50% -20%, rgba(226,190,39,.07), transparent 64%),
+    radial-gradient(1100px 700px at 88% 106%, rgba(253,138,105,.05), transparent 62%);
+}
+
+/* 비네트 — 가장자리를 눌러 화면 가운데로 시선을 모은다 */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(118% 88% at 50% 45%, transparent 38%, rgba(0,0,0,.74) 100%);
+}
+
+.card {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+.neon { color: var(--gold); }
+.dim  { color: var(--text-dim); }
+.mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+
+@keyframes 깜빡 { 0%,100% { opacity: 1 } 50% { opacity: .38 } }
+@keyframes 톡 {
+  0%   { transform: translateY(10px); opacity: 0 }
+  100% { transform: none; opacity: 1 }
+}
+
+/* 움직임 줄이기를 켠 사람에게는 애니메이션을 멈춘다 */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

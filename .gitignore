@@ -1,0 +1,13 @@
+node_modules/
+secrets/
+.env
+data/*.json
+data/images/*
+!data/images/.gitkeep
+
+# 인수인계 원본 압축본·화면 캡처 (커밋하지 않음)
+*.zip
+캡처/
+
+# 이전 기획자와의 대화 기록 — 공개 저장소에 올리지 않음
+docs/개발기록.md

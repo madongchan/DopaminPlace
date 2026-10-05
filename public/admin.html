@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>도파민플레이션 — 진행자</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+
+<!-- 로그인 -->
+<div class="login" id="login">
+  <div class="card lbox">
+    <div class="brand"><span class="b1">도파민</span><span class="b2">플레이션</span></div>
+    <h1>진행자 화면</h1>
+    <input id="in-pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off">
+    <div class="err" id="err-login"></div>
+    <button id="btn-login">들어가기</button>
+    <p class="hint">기본 PIN은 <b>0000</b>입니다. <code>.env</code>의 <code>ADMIN_PIN</code>으로 바꿀 수 있어요.</p>
+  </div>
+</div>
+
+<!-- 본 화면 -->
+<div class="admin" id="admin" hidden>
+
+  <header>
+    <div class="brand"><span class="b1">도파민</span><span class="b2">플레이션</span> <span class="tag">진행자</span></div>
+    <div class="meta">
+      입장코드 <b id="code">----</b>
+      <span class="sep">·</span>
+      <span id="url"></span>
+      <span class="sep">·</span>
+      참가자 <b id="count">0</b>명
+    </div>
+  </header>
+
+  <!-- 진행 순서: ① 입장 받기 → ② 팀 나누기 → ③ 게임 진행. 지금 단계 하나만 크게 보인다. -->
+  <nav class="a-단계바" id="steps">
+    <button data-step="1">① 입장 받기</button>
+    <button data-step="2">② 팀 나누기</button>
+    <button data-step="3">③ 게임 진행</button>
+  </nav>
+
+  <!-- ① 입장 받기 -->
+  <section class="card pane a-단계" id="s1" hidden>
+    <h2>① 입장 받기</h2>
+    <p class="a-안내">TV에 뜬 QR을 휴대폰 카메라로 찍게 하세요. 입장코드는 <b id="s1-code">----</b> 입니다.<br>
+      모두 들어오면 아래 버튼을 누르세요. 늦게 온 사람은 나중에도 들어올 수 있어요.</p>
+    <p class="a-도움">TV에는 이 노트북 브라우저에서 <b>/screen</b> 주소를 열고 F11(전체화면)을 누르면 QR이 나옵니다.</p>
+    <div class="a-입장수">지금 <b id="s1-count">0</b>명 입장</div>
+    <div class="a-이름들" id="s1-players"></div>
+    <div class="rowbtns">
+      <button class="a-큰버튼" id="btn-next1">다 들어왔어요 → 팀 나누기</button>
+    </div>
+  </section>
+
+  <!-- ② 팀 나누기 -->
+  <section class="card pane a-단계" id="s2" hidden>
+    <h2>② 팀 나누기</h2>
+    <p class="a-안내" id="s2-guide"></p>
+    <div class="a-팀요약" id="s2-teams"></div>
+    <div class="rowbtns">
+      <button class="a-큰버튼" id="btn-s2-main"></button>
+      <button class="ghost" id="btn-s2-sub" hidden>다시 섞기</button>
+    </div>
+  </section>
+
+  <!-- ③ 게임 진행 (보드 → 규칙 카드 → 진행) -->
+  <section class="card pane a-단계" id="s3" hidden>
+    <h2 id="game-title">③ 게임 고르기</h2>
+    <p class="a-안내" id="s3-guide"></p>
+    <div class="a-보드" id="a-board"></div>
+    <div id="game-body"></div>
+    <div class="rowbtns" id="game-btns"></div>
+  </section>
+
+  <!-- 점수판 (③ 단계에서만 보인다) -->
+  <section class="card pane" id="pane-score" hidden>
+    <h2>점수판</h2>
+    <div class="rowbtns">
+      <span class="a-라벨">TV에 띄울 화면</span>
+      <button class="sm ghost" data-big="auto">게임(보드)</button>
+      <button class="sm ghost" data-big="scoreboard">점수판</button>
+      <button class="sm ghost" data-big="teams">팀 소개</button>
+    </div>
+    <div class="a-점수판" id="a-score"></div>
+  </section>
+
+  <!-- 평소엔 열 필요 없는 세부 기능 -->
+  <details class="card pane a-고급" id="adv">
+    <summary>고급 · 세부 관리 <span>이름 수정, 기기 연결, 내보내기, 팀원 이동, 직접 팀 고르기, 점수 되돌리기</span></summary>
+
+    <div class="cols">
+
+      <!-- 참가자 -->
+      <section>
+        <h2>참가자</h2>
+        <div class="list" id="players"></div>
+        <div class="rowbtns">
+          <button class="sm ghost" id="btn-recode">입장코드 재발급</button>
+          <button class="sm ghost" id="btn-refresh">전체 휴대폰 새로고침</button>
+        </div>
+      </section>
+
+      <!-- 팀 -->
+      <section>
+        <h2>팀 편성 <span class="phase" id="phase"></span></h2>
+        <p class="a-도움">직접 고르게 하려면: 직접 선택 시작 → (참가자가 휴대폰에서 고름) → 고르기 마감 → (대표가 이름·색 정함) → 편성 완료</p>
+        <div class="rowbtns">
+          <button class="sm ghost" id="btn-random">랜덤 (대표가 이름·색 정함)</button>
+          <button class="sm ghost" id="btn-pick">직접 선택 시작</button>
+          <button class="sm ghost" id="btn-close-pick">고르기 마감</button>
+          <button class="sm ghost" id="btn-done">편성 완료</button>
+          <button class="sm danger" id="btn-reset">초기화</button>
+        </div>
+        <div class="teams" id="teams"></div>
+
+        <h2 class="a-둘째">점수 · 기록</h2>
+        <div class="rowbtns">
+          <span class="a-라벨">점수 기준</span>
+          <button class="sm ghost" data-mode="best">최고</button>
+          <button class="sm ghost" data-mode="latest">최근</button>
+          <button class="sm ghost" data-mode="total">누적</button>
+          <span class="a-틈"></span>
+          <button class="sm ghost" id="btn-undo">마지막 점수 되돌리기</button>
+        </div>
+        <div class="rowbtns">
+          <span class="a-시트" id="a-sheet"></span>
+          <button class="sm ghost" id="btn-sync">지금 동기화</button>
+        </div>
+      </section>
+
+    </div>
+  </details>
+
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script src="/vendor/socket.io.js"></script>
+<script type="module" src="/js/admin.js"></script>
+</body>
+</html>

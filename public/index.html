@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#0B1026">
+<title>도파민플레이션</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/phone.css">
+</head>
+<body>
+<div class="phone">
+
+  <div class="brand"><span class="b1">도파민</span><span class="b2">플레이션</span></div>
+  <!-- 연습 판 표시 (점수가 안 남는 판) -->
+  <div class="연습띠" id="practice" hidden>연습 판 · 점수에 들어가지 않아요</div>
+
+  <!-- 1. 입장코드 -->
+  <section class="step" id="step-code">
+    <h1>입장코드를<br>넣어주세요</h1>
+    <p class="sub">큰 화면(TV)에 떠 있는 숫자 4자리예요.</p>
+    <input id="in-code" type="tel" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+    <div class="err" id="err-code"></div>
+    <button id="btn-code">다음</button>
+    <button class="ghost" id="btn-to-recover">이미 입장했는데 화면이 초기화됐어요</button>
+  </section>
+
+  <!-- 1-b. 이름+PIN 복귀 (다른 브라우저·시크릿·카톡 인앱) -->
+  <section class="step" id="step-recover" hidden>
+    <h1>돌아오기</h1>
+    <p class="sub">입장할 때 쓴 이름과 비밀번호 4자리를 넣어주세요.</p>
+    <input id="in-rname" class="name" type="text" maxlength="6" placeholder="이름" autocomplete="off">
+    <input id="in-rpin" type="tel" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+    <div class="err" id="err-recover"></div>
+    <button id="btn-recover">돌아가기</button>
+    <button class="ghost" id="btn-back-recover">처음부터 입장하기</button>
+  </section>
+
+  <!-- 2. 이름 -->
+  <section class="step" id="step-name" hidden>
+    <h1>이름을<br>적어주세요</h1>
+    <p class="sub">큰 화면에 그대로 뜹니다. 최대 6자.</p>
+    <input id="in-name" class="name" type="text" maxlength="6" placeholder="예) 이채림" autocomplete="off">
+    <div class="err" id="err-name"></div>
+    <button id="btn-name">다음</button>
+    <button class="ghost" id="btn-back-name">뒤로</button>
+  </section>
+
+  <!-- 3. PIN -->
+  <section class="step" id="step-pin" hidden>
+    <h1>비밀번호<br>4자리를 정해주세요</h1>
+    <p class="sub">휴대폰이 꺼지거나 다른 브라우저로 들어와도 이 번호로 돌아올 수 있어요.</p>
+    <input id="in-pin" type="tel" inputmode="numeric" maxlength="4" placeholder="0000" autocomplete="off">
+    <div class="err" id="err-pin"></div>
+    <button id="btn-pin">입장하기</button>
+    <button class="ghost" id="btn-back-pin">뒤로</button>
+  </section>
+
+  <!-- 4. 입장 완료 / 대기 -->
+  <section class="step" id="step-done" hidden>
+    <div class="done">
+      <p class="sub">입장했습니다</p>
+      <div class="name" id="my-name"></div>
+      <div class="myteam" id="my-team" hidden></div>
+      <div class="wait" id="wait-msg">곧 시작합니다. 화면을 켜둔 채 기다려주세요</div>
+      <button class="ghost" id="btn-team-edit" hidden>우리 팀 이름·색 바꾸기</button>
+    </div>
+  </section>
+
+  <!-- 5. 팀 고르기 -->
+  <section class="step" id="step-pick" hidden>
+    <h1>팀을 골라주세요</h1>
+    <p class="sub">인원이 비슷해야 해서, 사람이 많은 팀은 잠깁니다.</p>
+    <div class="teampick" id="teampick"></div>
+    <div class="err" id="err-pick"></div>
+  </section>
+
+  <!-- 6. 팀 이름·색 정하기 (팀 대표만) -->
+  <section class="step" id="step-team" hidden>
+    <h1>우리 팀 이름과<br>색을 정해주세요</h1>
+    <p class="sub">팀 대표로 뽑히셨어요. 큰 화면에 그대로 뜹니다.</p>
+    <input id="in-team" class="name" type="text" maxlength="8" placeholder="팀 이름 (최대 8자)" autocomplete="off">
+    <div class="palette" id="palette"></div>
+    <div class="err" id="err-team"></div>
+    <button id="btn-team">정했어요</button>
+  </section>
+
+  <!-- 7. 규칙 카드 -->
+  <section class="step" id="step-rules" hidden>
+    <div class="p-규칙상자" id="p-rule-box"></div>
+  </section>
+
+  <!-- 8. 게임 진행 (게임별 화면이 여기에 그려진다) -->
+  <section class="step" id="step-game" hidden></section>
+
+  <div class="net" id="net">연결 중…</div>
+</div>
+
+<script src="/vendor/socket.io.js"></script>
+<script type="module" src="/js/phone.js"></script>
+</body>
+</html>

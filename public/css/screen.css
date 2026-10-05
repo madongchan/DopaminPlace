@@ -1,0 +1,675 @@
+/* 큰 화면(TV, 1920×1080 가정). 3~5m 떨어져도 읽히게 본문 최소 28px. */
+body { overflow: hidden; height: 100vh; }
+
+.screen {
+  height: 100vh;
+  display: flex; flex-direction: column;
+  padding: 40px 56px;
+  gap: 28px;
+}
+
+/* 상단 바 */
+.top {
+  display: flex; align-items: center; justify-content: space-between;
+  flex: 0 0 auto;
+}
+.brand { font-size: 44px; letter-spacing: -.02em; }
+.brand .b1 { color: var(--neon); }
+.brand .b2 { color: var(--neon-3); }
+.top .stat { font-size: 28px; color: var(--text-dim); }
+
+/* 본문 2열: 왼쪽 입장 안내 / 오른쪽 대기실 */
+.body { flex: 1 1 auto; display: grid; grid-template-columns: 720px 1fr; gap: 40px; min-height: 0; }
+
+/* 입장 패널 */
+.enter { padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.enter .label { font-size: 30px; color: var(--text-dim); }
+.qr {
+  width: 420px; height: 420px; background: #fff; border-radius: var(--r);
+  padding: 14px; display: grid; place-items: center;
+}
+.qr img { width: 100%; height: 100%; image-rendering: pixelated; }
+.url { font-size: 30px; color: var(--neon-4); word-break: break-all; text-align: center; }
+
+.code-box { text-align: center; }
+.code-box .label { font-size: 28px; }
+.code {
+  font-size: 132px; line-height: 1; color: var(--neon);
+  letter-spacing: .14em; text-shadow: 0 0 40px rgba(255,212,0,.45);
+}
+
+/* 대기실 */
+.lobby { padding: 36px 40px; display: flex; flex-direction: column; min-height: 0; }
+.lobby h2 { margin: 0 0 22px; font-size: 38px; }
+.lobby h2 .count { color: var(--neon-2); }
+.grid {
+  flex: 1 1 auto; min-height: 0; overflow: auto;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 18px; align-content: start;
+}
+.pcard {
+  background: var(--bg-3); border: 2px solid var(--line); border-radius: var(--r-s);
+  padding: 22px 18px; text-align: center; font-size: 36px;
+  animation: 톡 .32s ease-out;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.pcard .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--neon-2); flex: 0 0 auto; }
+.pcard.off { opacity: .45; border-style: dashed; }
+.pcard.off .dot { background: var(--text-dim); }
+
+.empty { font-size: 32px; color: var(--text-dim); margin-top: 40px; text-align: center; animation: 깜빡 1.8s infinite; }
+
+/* 하단 안내 */
+.foot { flex: 0 0 auto; font-size: 26px; color: var(--text-dim); text-align: center; }
+
+/* 접속 주소가 바뀌었을 때 알림 배너 */
+.alert {
+  position: fixed; left: 50%; top: 28px; transform: translateX(-50%);
+  background: var(--neon-3); color: #0B1026;
+  font-size: 28px; padding: 18px 34px; border-radius: var(--r);
+  box-shadow: 0 12px 40px rgba(0,0,0,.5); z-index: 90;
+  animation: 톡 .3s ease-out;
+}
+.alert[hidden] { display: none; }
+
+/* 대체 주소 */
+.alt {
+  font-size: 22px; color: var(--text-dim); text-align: center; line-height: 1.5;
+}
+.alt[hidden] { display: none; }
+
+/* ── 2단계: 팀 표시 ───────────────────────────────────────── */
+.teamview {
+  flex: 1 1 auto; min-height: 0; overflow: auto;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-content: start;
+}
+.teamview[hidden] { display: none; }
+
+.tv-card {
+  background: var(--bg-3); border: 4px solid var(--line); border-radius: var(--r);
+  padding: 22px 18px; display: flex; flex-direction: column; gap: 14px;
+  animation: 톡 .35s ease-out;
+}
+.tv-card .hd { text-align: center; }
+.tv-card .tn { font-size: 40px; line-height: 1.15; }
+.tv-card .tc { font-size: 22px; color: var(--text-dim); margin-top: 4px; }
+.tv-card .mem { display: flex; flex-direction: column; gap: 8px; }
+.tv-card .m {
+  font-size: 28px; text-align: center; padding: 9px 6px;
+  background: rgba(255,255,255,.06); border-radius: var(--r-s);
+}
+.tv-card .m.off { opacity: .4; }
+.tv-card .none { font-size: 24px; color: var(--text-dim); text-align: center; padding: 14px; }
+
+/* 팀 고르는 중이라는 안내 */
+.picking-note {
+  font-size: 26px; color: var(--neon-4); text-align: center; animation: 깜빡 1.6s infinite;
+}
+
+/* ══════════════════════════════════════════════════════════
+   첫 화면 — 2025 워크숍 PPT 1장 그대로.
+   좌표는 1920×1080 슬라이드 기준을 % 로 옮겨 TV 크기가 달라도 맞는다.
+   이미지는 PPT에서 추출해 public/images/intro/ 에 넣었다.
+   ══════════════════════════════════════════════════════════ */
+.intro {
+  position: fixed; inset: 0; z-index: 100;
+  background: #000;              /* PPT 1장 배경도 순수 검정 */
+  overflow: hidden;
+}
+.intro.gone { display: none; }
+
+/* ── 배경 층 (PPT와 같은 순서·투명도) ── */
+.bg {
+  position: absolute; pointer-events: none;
+  background-repeat: no-repeat; background-size: 100% 100%;
+}
+.space {                                   /* 우주 + 별 + 성운 */
+  inset: -.1%;
+  background-image: url('/images/intro/space.png');
+  opacity: .50;
+}
+.glow-top {                                /* 위쪽 발광 띠 */
+  left: -.1%; top: -1%; width: 100.2%; height: 30.8%;
+  background-image: url('/images/intro/glow-top.png');
+  opacity: .40;
+}
+.glow-bot {                                /* 아래쪽 발광 띠 (PPT에서 180° 회전) */
+  left: -.1%; top: 70.2%; width: 100.2%; height: 30.9%;
+  background-image: url('/images/intro/glow-bot.png');
+  opacity: .40; transform: rotate(180deg);
+}
+.earth {                                   /* 지구 지평선 + 떠오르는 태양 */
+  left: -.6%; top: 58.9%; width: 100.9%; height: 43.3%;
+  background-image: url('/images/intro/earth.png');
+  opacity: .55;
+}
+.stripe {                                  /* 금색 사선 줄무늬 바 */
+  left: 2.4%; top: 92.3%; width: 95.3%; height: 3.1%;
+  background-image: url('/images/intro/stripe.png');
+  background-size: auto 100%; background-repeat: repeat-x;
+}
+
+/* ── 상단 장식 ── */
+.deco-top { position: absolute; inset: 0; pointer-events: none; }
+/* PPT 1장 좌표 그대로: 왼쪽 장식 x=180, 오른쪽 x=1132, 각 폭 608 (1920 기준) */
+.deco-top .corner { position: absolute; top: 4.7%; width: 31.7%; height: auto; }
+.deco-top .l { left: 9.4%; }
+.deco-top .r { left: 59.0%; transform: scaleX(-1); }
+/* 가운데 점 세 개: x=869·945·1023, y=79 */
+.dots {
+  position: absolute; top: 6.9%; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 48px;
+}
+.dots i {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--ppt-gold);
+  animation: 점깜빡 2.4s ease-in-out infinite;
+}
+.dots i:nth-child(2) { animation-delay: .35s }
+.dots i:nth-child(3) { animation-delay: .7s }
+@keyframes 점깜빡 { 0%,100% { opacity: .35 } 50% { opacity: 1 } }
+
+/* ── 가운데 ── */
+.stage {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: flex-start; padding-top: 6.2%;
+}
+
+.eyebrow {
+  font-size: 42px; font-weight: 900; letter-spacing: .14em;
+  color: var(--ppt-lime);
+  /* 외곽선을 stroke로 주면 글자 속까지 덮여서, 그림자를 여덟 방향으로 둘러 만든다 */
+  text-shadow:
+    -3px -3px 0 var(--ppt-navy),  3px -3px 0 var(--ppt-navy),
+    -3px  3px 0 var(--ppt-navy),  3px  3px 0 var(--ppt-navy),
+     0   -3px 0 var(--ppt-navy),  0    3px 0 var(--ppt-navy),
+    -3px  0   0 var(--ppt-navy),  3px  0   0 var(--ppt-navy),
+     0    6px 0 rgba(7,53,230,.45);
+  margin-bottom: 4px;
+}
+
+/* 금색 유성 — 제목 위를 가로지른다 */
+.comet {
+  width: 78%; height: auto;
+  margin: 10px 0 -14px;        /* 제목 바로 위를 스쳐 지나간다 */
+  opacity: .95;
+}
+
+/* ── 큰 제목: 글자마다 SVG 하나. 라임→흰→파랑 채움 + 금·네이비 이중 테두리 ── */
+.bigtitle {
+  display: flex; align-items: flex-end; justify-content: center;
+  margin: -1.2vw 0 0;
+}
+/* 글자 한 칸. viewBox 260 중 양옆 30씩이 테두리 여백이라,
+   이웃 글자와 그만큼 겹쳐 붙여야 자간이 맞는다. */
+.chsvg {
+  /* flex 안에서 SVG의 height:auto 는 0으로 접힌다. viewBox 260×300 비율로 직접 준다. */
+  width: 15.4vw; height: 17.8vw;
+  overflow: visible; flex: 0 0 auto; display: block;
+  will-change: transform, opacity, filter;
+}
+.word { display: flex; align-items: flex-end; }
+.word .chsvg + .chsvg { margin-left: -4.8vw; }
+.w2 { margin-left: -4.8vw; }
+
+.bigtitle .t {
+  font-family: var(--font);
+  font-size: 200px; font-weight: 900;
+  text-anchor: middle;
+  paint-order: stroke;          /* 테두리를 먼저 그려 채움이 덮이지 않게 */
+  stroke-linejoin: round;
+}
+.bigtitle .shadow { fill: #0735E6; stroke: #0735E6; stroke-width: 26px; opacity: .5; }
+.bigtitle .gold   { fill: var(--ppt-gold); stroke: var(--ppt-gold); stroke-width: 30px; }
+.bigtitle .fill   { fill: url(#titleFill); stroke: var(--ppt-navy); stroke-width: 13px; }
+
+/* 부딪히는 순간 퍼지는 충격파 */
+.shock {
+  position: absolute; left: 50%; top: 46%;
+  width: 40px; height: 40px; margin: -20px 0 0 -20px;
+  border-radius: 50%; border: 4px solid rgba(226,190,39,.95);
+  opacity: 0; pointer-events: none; z-index: 2;
+}
+
+.shock2 { border-color: rgba(255,255,255,.8); border-width: 3px; }
+
+/* ── 어원 ── */
+.origin {
+  margin-top: 1.1vw; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.origin .o1 {
+  font-size: 32px; font-weight: 800; color: #C9D6EC;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; justify-content: center;
+}
+.origin .o1 b {
+  font-size: 25px; font-weight: 800; color: var(--ppt-gold);
+  margin-left: 4px; letter-spacing: .02em;
+}
+.origin .o1 .plus { color: var(--ppt-gold); font-size: 28px; margin: 0 6px; }
+.origin .o2 {
+  font-size: 27px; font-weight: 700; color: #8FA0BE; line-height: 1.5;
+}
+
+/* ── 게임 시작하기: 크고 입체감 있게 ── */
+.btn-wrap {
+  position: absolute; left: 0; right: 0; bottom: 11%;
+  display: flex; justify-content: center;   /* 화면 전체 폭 기준 정중앙 */
+  z-index: 3;
+}
+.start-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  padding: 30px 108px;
+  border: none; border-radius: 999px;
+  font-family: var(--font); cursor: pointer;
+  color: #05102E;
+  /* 위가 밝고 아래로 어두워지는 금속 금색 */
+  background: linear-gradient(180deg, #FBE9A8 0%, #F0CE5A 34%, #E2BE27 62%, #C39D14 100%);
+  /* 아래로 두껍게 깔린 테두리가 버튼의 '두께'가 된다 */
+  box-shadow:
+    0 12px 0 #8A6D0E,
+    0 14px 0 #5E4A08,
+    0 26px 34px rgba(0,0,0,.65),
+    inset 0 3px 0 rgba(255,255,255,.75),
+    inset 0 -5px 10px rgba(120,92,8,.45);
+  transform: translateY(0);
+  transition: transform .08s ease-out, box-shadow .08s ease-out, filter .2s;
+  animation: 버튼숨 3.2s ease-in-out infinite;
+}
+.start-btn .sb-label {
+  font-size: 46px; font-weight: 900; letter-spacing: .02em;
+  text-shadow: 0 2px 0 rgba(255,255,255,.55);
+}
+.start-btn .sb-sub { font-size: 20px; font-weight: 800; color: #6B5A1E; letter-spacing: .03em; }
+.start-btn:hover { filter: brightness(1.07); }
+/* 누르면 실제로 눌려 들어간다 */
+.start-btn:active {
+  transform: translateY(11px);
+  box-shadow:
+    0 1px 0 #8A6D0E,
+    0 3px 0 #5E4A08,
+    0 8px 14px rgba(0,0,0,.6),
+    inset 0 3px 0 rgba(255,255,255,.5),
+    inset 0 -3px 8px rgba(120,92,8,.5);
+}
+@keyframes 버튼숨 {
+  0%,100% { filter: drop-shadow(0 0 0 rgba(226,190,39,0)) }
+  50%     { filter: drop-shadow(0 0 26px rgba(226,190,39,.45)) }
+}
+
+.intro-keys {
+  position: absolute; right: 26px; bottom: 20px; z-index: 3;
+  font-size: 14px; color: #6B7A99; font-weight: 700; letter-spacing: .06em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dots i, .start-btn { animation: none }
+}
+
+/* ── 상단 바 로고 (첫 화면을 지나간 뒤) ── */
+.brand .ch { display: inline-block; }
+.brand .b1 { color: var(--ppt-lime); }
+.brand .b2 { color: var(--ppt-gold); }
+
+/* ══════════════════════════════════════════════════════════
+   3단계 — 게임 보드 · 규칙 카드 · 게임 화면 · 점수판
+   TV에서 3~5m 떨어져도 읽히게 (SPEC 9장)
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 게임 보드 ── */
+.board { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 26px; }
+.b-제목 { margin: 0; font-size: 40px; }
+.b-블록들 {
+  flex: 1 1 auto; min-height: 0;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));   /* SPEC 3장: 8개를 2행 4열 */
+  gap: 22px; align-content: start;
+}
+.b-블록 {
+  background: var(--bg-2); border: 4px solid var(--line); border-radius: var(--r);
+  padding: 24px; display: flex; flex-direction: column; gap: 12px; position: relative;
+  box-shadow: inset 0 0 60px -30px var(--gc, transparent);
+}
+.b-블록.부족 { opacity: .4; }
+.b-뱃지들 { display: flex; gap: 8px; }
+.b-뱃지 {
+  font-size: 20px; font-weight: 800; color: var(--text-dim);
+  background: var(--bg-3); padding: 5px 12px; border-radius: 999px;
+}
+.b-이름 { font-size: 46px; line-height: 1.1; margin-top: auto; }
+.b-상태 { font-size: 24px; color: var(--text-dim); }
+.b-결과 {
+  font-size: 24px; font-weight: 900; color: var(--ppt-gold);
+  border-top: 2px solid var(--line); padding-top: 12px;
+}
+.b-없음 { grid-column: 1 / -1; display: grid; place-items: center; font-size: 30px; color: var(--text-dim); }
+
+/* ── 규칙 카드 ── */
+.rulecard { flex: 1 1 auto; display: grid; place-items: center; }
+.rc-상자 {
+  width: min(1100px, 88%); background: var(--bg-2);
+  border: 5px solid var(--line); border-radius: 24px; padding: 56px 64px;
+  display: flex; flex-direction: column; gap: 22px; animation: 톡 .35s ease-out;
+}
+.rc-종류 { font-size: 26px; color: var(--text-dim); font-weight: 800; letter-spacing: .1em; }
+.rc-이름 { font-size: 88px; line-height: 1; }
+.rc-규칙 { margin: 8px 0 0; padding-left: 34px; display: flex; flex-direction: column; gap: 16px; }
+.rc-규칙 li { font-size: 34px; line-height: 1.4; }
+.rc-대기 {
+  margin-top: 16px; font-size: 26px; color: var(--text-dim);
+  animation: 깜빡 1.8s infinite;
+}
+
+/* ── 게임 화면 공통 ── */
+.play { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 22px; }
+.g-머리 { display: flex; align-items: baseline; justify-content: space-between; }
+.g-이름 { font-size: 34px; color: var(--text-dim); }
+.g-라운드 { font-size: 40px; color: var(--ppt-gold); }
+
+/* 타이머 */
+.tp-타이머 { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.tp-초 { font-size: 112px; line-height: 1; color: var(--ppt-gold); font-variant-numeric: tabular-nums; }
+.tp-초.급함 { color: var(--coral); animation: 깜빡 .5s infinite; }
+.tp-초.끝 { color: var(--text-dim); }
+.tp-띠 { width: 62%; height: 12px; border-radius: 999px; background: var(--bg-3); overflow: hidden; position: relative; }
+.tp-띠::after {
+  content: ''; position: absolute; inset: 0 auto 0 0;
+  width: calc(var(--p, 0) * 100%); background: var(--ppt-gold); border-radius: 999px;
+  transition: width .1s linear;
+}
+
+/* ── 텔레파시 ── */
+.tp-제시어 {
+  text-align: center; font-size: 62px; line-height: 1.25;
+  padding: 26px 40px; background: var(--bg-2);
+  border: 3px solid var(--line); border-radius: var(--r);
+}
+.tp-안내 { text-align: center; font-size: 30px; color: var(--text-dim); animation: 깜빡 1.8s infinite; }
+
+.제출바 { display: flex; justify-content: center; gap: 20px; }
+.제출칸 {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: 16px 28px; border: 4px solid var(--line); border-radius: var(--r);
+  background: var(--bg-2);
+}
+.제출칸.완료 { background: rgba(255,255,255,.06); }
+.제출팀 { font-size: 30px; }
+.제출수 { font-size: 36px; font-variant-numeric: tabular-nums; }
+
+.tp-공개 { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.tp-팀카드 {
+  background: var(--bg-2); border: 4px solid var(--line); border-radius: var(--r);
+  padding: 22px; display: flex; flex-direction: column; gap: 16px; overflow: auto;
+  animation: 톡 .3s ease-out;
+}
+.tp-팀머리 { display: flex; align-items: baseline; justify-content: space-between; }
+.tp-팀이름 { font-size: 36px; }
+.tp-팀점수 { font-size: 44px; font-variant-numeric: tabular-nums; }
+.tp-답들 { display: flex; flex-direction: column; gap: 10px; }
+.tp-답 {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  font-size: 30px; padding: 12px 18px; border: 3px solid transparent;
+  background: var(--bg-3); border-radius: var(--r-s);
+}
+.tp-답.최다 { background: rgba(255,255,255,.07); }
+.tp-답수 { font-size: 28px; font-weight: 900; }
+.tp-답없음 { font-size: 26px; color: var(--text-dim); padding: 12px; }
+
+.tp-누적 { display: flex; justify-content: center; gap: 34px; }
+.tp-누적칸 { display: flex; align-items: baseline; gap: 12px; }
+.tp-누적팀 { font-size: 28px; }
+.tp-누적점 { font-size: 36px; font-variant-numeric: tabular-nums; }
+
+/* ── 점수판 ── */
+.scoreboard { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 24px; }
+.sb-제목 { margin: 0; font-size: 44px; }
+.sb-기준 { font-size: 28px; color: var(--ppt-gold); margin-left: 14px; }
+.sb-둘 { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 34px; overflow: auto; }
+.sb-칸 h3 { margin: 0 0 16px; font-size: 32px; color: var(--text-dim); }
+
+.순위막대 { display: flex; flex-direction: column; gap: 12px; }
+.순위줄 { display: grid; grid-template-columns: 54px 200px 1fr 110px; align-items: center; gap: 16px; }
+.순위등수 { font-size: 28px; color: var(--text-dim); text-align: right; }
+.순위이름 { font-size: 30px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.순위바 { height: 22px; background: var(--bg-3); border-radius: 999px; overflow: hidden; }
+.순위바 i { display: block; height: 100%; border-radius: 999px; transition: width .4s ease-out; }
+.순위점수 { font-size: 30px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── 미니 팀 순위 ── */
+.mini { flex: 0 0 auto; display: flex; justify-content: center; gap: 40px; padding-top: 6px; }
+.mini-칸 { display: flex; align-items: baseline; gap: 12px; }
+.mini-등수 { font-size: 22px; color: var(--text-dim); }
+.mini-이름 { font-size: 28px; }
+.mini-점수 { font-size: 32px; font-variant-numeric: tabular-nums; }
+
+/* ── 카드 그리드 (공통) ── */
+.카드그리드 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.인원카드 {
+  background: var(--bg-3); border: 3px solid var(--line); border-radius: var(--r-s);
+  padding: 16px; text-align: center; font-size: 30px;
+}
+.인원카드.끊김 { opacity: .4; border-style: dashed; }
+.인원카드.out { opacity: .35; text-decoration: line-through; }
+.인원카드.done { background: rgba(255,255,255,.08); }
+
+/* ══════════════════════════════════════════════════════════
+   5단계 게임 — 큰 화면
+   ══════════════════════════════════════════════════════════ */
+
+.tp-안내작게 { margin-top: 10px; font-size: 20px; color: var(--text-dim2); }
+
+/* ── 눈치 게임 ─────────────────────────────────────────── */
+.nc-남음 { display: flex; align-items: baseline; gap: 12px; justify-content: center; margin: 6px 0 14px; }
+.nc-남음수 { font-size: 64px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.nc-남음말 { font-size: 26px; color: var(--text-dim); }
+
+.nc-숫자판 {
+  display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+  margin: 10px 0 18px;
+}
+.nc-칸 {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 130px; padding: 14px 18px;
+  background: var(--bg-2); border: 2px solid var(--line-2); border-radius: var(--r);
+  animation: 톡 .22s ease-out both;
+}
+.nc-칸.탈락 { opacity: .42; border-color: var(--line); }
+.nc-번호 { font-size: 56px; line-height: 1; color: var(--gold); font-variant-numeric: tabular-nums; }
+.nc-칸.탈락 .nc-번호 { color: var(--text-dim2); text-decoration: line-through; }
+.nc-이름 { font-size: 24px; }
+.nc-탈락딱지 {
+  margin-top: 4px; padding: 1px 8px; border-radius: 999px;
+  background: var(--coral-lo); color: var(--coral-hi); font-size: 17px;
+}
+.nc-순위 { margin-top: 8px; }
+.nc-순위 h3 { margin: 0 0 8px; font-size: 22px; color: var(--text-dim); }
+
+/* ── 반응속도 ──────────────────────────────────────────── */
+.rt-신호 {
+  display: grid; place-items: center;
+  min-height: 42vh; margin: 12px 0 16px;
+  border-radius: var(--r); border: 3px solid transparent;
+}
+.rt-신호.빨강 { background: #2A0A10; border-color: #7A1526; }
+.rt-신호.초록 { background: #0C3A20; border-color: var(--ok); }
+.rt-신호글 { font-size: 13vh; line-height: 1; letter-spacing: -.02em; }
+.rt-신호.빨강 .rt-신호글 { color: #C6485C; animation: 깜빡 1.1s ease-in-out infinite; }
+.rt-신호.초록 .rt-신호글 { color: #7BE8A8; }
+
+.rt-기록판 { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.rt-줄 { display: grid; grid-template-columns: 72px 1fr 5fr 130px; align-items: center; gap: 12px; }
+.rt-등수 { font-size: 24px; color: var(--text-dim); }
+.rt-이름 { font-size: 26px; white-space: nowrap; }
+.rt-바 { height: 18px; background: var(--bg-3); border-radius: 999px; overflow: hidden; }
+.rt-바 > i { display: block; height: 100%; background: var(--gold-lo); }
+.rt-줄.으뜸 .rt-바 > i { background: var(--gold); }
+.rt-줄.으뜸 .rt-이름 { color: var(--gold); }
+.rt-ms { font-size: 28px; text-align: right; font-variant-numeric: tabular-nums; }
+
+/* ── 초성 퀴즈 ─────────────────────────────────────────── */
+.cs-초성 {
+  text-align: center; margin: 10px 0 6px;
+  font-size: 15vh; line-height: 1.05; letter-spacing: .1em;
+  color: var(--gold); text-shadow: 0 6px 30px rgba(226,190,39,.22);
+}
+.cs-정답 { display: flex; align-items: baseline; justify-content: center; gap: 16px; margin: 8px 0 14px; }
+.cs-정답말 { font-size: 24px; color: var(--text-dim); }
+.cs-정답글 { font-size: 72px; color: var(--ok); }
+
+.cs-힌트 {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin: 0 auto 14px; padding: 10px 20px; width: fit-content;
+  background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 999px;
+  font-size: 26px;
+}
+.cs-힌트말 { color: var(--gold); font-size: 21px; }
+.cs-힌트.닫힘 { color: var(--text-dim2); font-size: 21px; border-style: dashed; }
+
+.cs-맞힌 { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.cs-맞힌칸 {
+  display: grid; grid-template-columns: 90px 1fr 1fr 110px auto;
+  align-items: center; gap: 14px;
+  padding: 12px 18px; background: var(--bg-2);
+  border: 2px solid var(--line-2); border-radius: var(--r);
+  animation: 톡 .22s ease-out both;
+}
+.cs-맞힌순서 { font-size: 30px; color: var(--text-dim); }
+.cs-맞힌팀 { font-size: 30px; }
+.cs-맞힌이름 { font-size: 26px; color: var(--text-dim); }
+.cs-맞힌점 { font-size: 34px; text-align: right; }
+.cs-인정 {
+  padding: 2px 10px; border-radius: 999px;
+  background: var(--gold-lo); color: var(--gold-hi); font-size: 18px;
+}
+
+/* ── 병뚜껑 던지기 ─────────────────────────────────────── */
+.bc-차례 {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  margin: 10px 0 18px; padding: 22px 28px;
+  background: var(--bg-2); border: 3px solid var(--line-2); border-radius: var(--r);
+}
+.bc-차례말 { font-size: 22px; color: var(--text-dim); }
+.bc-차례이름 { font-size: 8.4vh; line-height: 1.05; }
+.bc-차례팀 { font-size: 26px; color: var(--text-dim); }
+.bc-기회 { display: flex; gap: 12px; margin-top: 10px; }
+.bc-뚜껑 {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 3px solid var(--line-2); background: var(--line);
+}
+.bc-뚜껑.씀 { opacity: .3; }
+.bc-이번 { display: flex; gap: 10px; margin-top: 12px; }
+.bc-이번점 {
+  padding: 6px 16px; border-radius: var(--r-s);
+  background: var(--bg-3); border: 1px solid var(--line-2);
+  font-size: 30px; font-variant-numeric: tabular-nums;
+}
+.bc-이번점.빵 { color: var(--text-dim2); }
+.bc-다음 { margin-top: 12px; font-size: 24px; color: var(--text-dim); }
+
+.bc-팀들 { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
+.bc-팀칸 {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  min-width: 190px; padding: 14px 20px;
+  background: var(--bg-2); border: 2px solid var(--line-2); border-radius: var(--r);
+}
+.bc-팀이름 { font-size: 24px; }
+.bc-팀평균 { font-size: 52px; line-height: 1; font-variant-numeric: tabular-nums; }
+.bc-팀셈 { font-size: 19px; color: var(--text-dim2); }
+
+.bc-개인 h3 { margin: 0 0 8px; font-size: 22px; color: var(--text-dim); }
+.bc-개인줄 {
+  display: grid; grid-template-columns: 1fr 110px 130px;
+  align-items: center; gap: 12px;
+  padding: 3px 0; border-bottom: 1px solid var(--line);
+  font-size: 21px;
+}
+.bc-개인이름 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bc-개인총 { text-align: right; font-variant-numeric: tabular-nums; }
+.bc-개인최고 { text-align: right; color: var(--text-dim2); font-size: 20px; }
+
+/* ══════════════════════════════════════════════════════════
+   마피아 — 큰 화면
+   ══════════════════════════════════════════════════════════ */
+.mf-단계 { display: flex; align-items: baseline; justify-content: center; gap: 16px; margin: 6px 0 10px; }
+.mf-단계글 { font-size: 46px; color: var(--gold); }
+.mf-멈춤 { font-size: 22px; color: var(--coral); }
+
+.mf-소식 { text-align: center; margin: 14px 0; }
+.mf-죽음 { font-size: 56px; color: var(--coral); }
+.mf-무사 { font-size: 56px; color: var(--ok); }
+.mf-의심 { display: flex; justify-content: center; align-items: baseline; gap: 14px; margin-bottom: 14px; }
+.mf-의심말 { font-size: 22px; color: var(--text-dim); }
+.mf-의심이름 { font-size: 40px; }
+
+.mf-변론 { text-align: center; margin: 14px 0; }
+.mf-변론말 { display: block; font-size: 24px; color: var(--text-dim); }
+.mf-변론이름 { font-size: 72px; color: var(--gold); }
+
+.mf-센것 { text-align: center; margin: 10px 0 14px; }
+.mf-센수 { font-size: 64px; color: var(--gold); font-variant-numeric: tabular-nums; }
+.mf-센말 { font-size: 24px; color: var(--text-dim); margin-left: 8px; }
+
+.mf-처형 {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  margin: 10px auto 14px; padding: 12px 24px; width: fit-content;
+  border: 2px solid var(--coral-lo); border-radius: var(--r);
+  font-size: 32px; color: var(--coral);
+}
+.mf-처형.무죄 { border-color: var(--line-2); color: var(--text-dim); }
+.mf-처형수 { font-size: 20px; color: var(--text-dim2); }
+
+.mf-득표 { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+.mf-득표칸 {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 8px 16px; background: var(--bg-2);
+  border: 1px solid var(--line-2); border-radius: var(--r-s); font-size: 24px;
+}
+.mf-득표이름 { white-space: nowrap; }
+.mf-득표수 { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+/* 밤에는 화면 전체를 한 단계 더 눌러 어둡게 한다 */
+.밤중 { filter: brightness(.72) saturate(.85); transition: filter .6s ease; }
+
+.mf-사람들 { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 14px; }
+.mf-사람 {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: var(--bg-2);
+  border: 2px solid var(--line-2); border-radius: var(--r-s);
+}
+.mf-사람.죽음 { opacity: .4; border-style: dashed; }
+.mf-사람이름 { font-size: 26px; }
+.mf-사람.죽음 .mf-사람이름 { text-decoration: line-through; color: var(--text-dim2); }
+.mf-사람딱지 {
+  padding: 1px 8px; border-radius: 999px;
+  background: var(--coral-lo); color: var(--coral-hi); font-size: 16px;
+}
+
+.mf-기록 { text-align: center; }
+.mf-기록줄 { font-size: 20px; color: var(--text-dim2); padding: 2px 0; }
+
+.mf-결과 { text-align: center; margin: 18px 0; font-size: 84px; }
+.mf-결과.시민 { color: var(--ok); }
+.mf-결과.마피아 { color: var(--coral); }
+
+.mf-역할표 {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px;
+}
+.mf-역할칸 {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  padding: 10px 16px; background: var(--bg-2);
+  border: 2px solid var(--line-2); border-radius: var(--r-s);
+}
+.mf-역할칸.마피아 { border-color: var(--coral-lo); }
+.mf-역할칸.죽음 { opacity: .5; }
+.mf-역할이름 { font-size: 24px; }
+.mf-역할글 { font-size: 22px; color: var(--text-dim); }
+.mf-역할칸.마피아 .mf-역할글 { color: var(--coral); }
+
+/* ── 연습 판 표시 — 위쪽 가운데에 늘 떠 있다 ── */
+.연습띠 {
+  position: fixed; left: 50%; top: 34px; transform: translateX(-50%);
+  background: var(--blue); color: #fff;
+  font-size: 30px; font-weight: 900; padding: 14px 36px; border-radius: 999px;
+  box-shadow: 0 10px 34px rgba(0,0,0,.5); z-index: 80;
+}

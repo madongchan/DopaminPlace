@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1920, initial-scale=1">
+<title>도파민플레이션 — 큰 화면</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/css/screen.css">
+</head>
+<body>
+
+<!-- 첫 화면 — 2025 워크숍 PPT 1장의 구성.
+     제목은 글자마다 SVG 하나씩. 그래야 「도파민」과 「플레이션」이
+     따로 솟아올라 부딪히고(두둥), 글자별 물결도 줄 수 있다. -->
+
+<!-- 제목 채움에 쓰는 그라데이션 (한 번만 정의해 모든 글자가 함께 쓴다) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="titleFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#9BDB4D"/>
+      <stop offset="18%"  stop-color="#B9EA74"/>
+      <stop offset="38%"  stop-color="#E8F8CE"/>
+      <stop offset="50%"  stop-color="#FFFFFF"/>
+      <stop offset="58%"  stop-color="#FFFFFF"/>
+      <stop offset="78%"  stop-color="#7FA4EE"/>
+      <stop offset="100%" stop-color="#1F45CE"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="intro" id="intro">
+
+  <!-- 배경 층 (PPT 1장과 같은 순서·투명도) -->
+  <div class="bg space"></div>
+  <div class="bg glow-top"></div>
+  <div class="bg glow-bot"></div>
+  <div class="bg earth"></div>
+  <div class="shock" id="shock"></div>
+  <div class="shock shock2" id="shock2"></div>
+
+  <!-- 상단 장식 -->
+  <div class="deco-top">
+    <img class="corner l" src="/images/intro/corner-l.png" alt="">
+    <span class="dots"><i></i><i></i><i></i></span>
+    <img class="corner r" src="/images/intro/corner-r.png" alt="">
+  </div>
+
+  <!-- 가운데 -->
+  <div class="stage" id="stage">
+    <div class="eyebrow">DOPAMINFLATION</div>
+
+    <img class="comet" id="comet" src="/images/intro/comet.png" alt="">
+
+    <!-- 글자는 intro.js가 채운다 -->
+    <div class="bigtitle" id="bigtitle">
+      <span class="word w1" id="w1"></span><span class="word w2" id="w2"></span>
+    </div>
+
+    <div class="origin" id="origin">
+      <div class="o1">도파민<b>Dopamine</b><span class="plus">＋</span>인플레이션<b>Inflation</b></div>
+      <div class="o2">이전보다 더 강한 자극을 받아야만 만족을 느끼게 되는 현상을 뜻하는 신조어</div>
+    </div>
+  </div>
+
+  <!-- 금색 사선 줄무늬 바 -->
+  <div class="bg stripe"></div>
+
+  <!-- 버튼은 화면 전체 폭에서 가운데 정렬 -->
+  <div class="btn-wrap">
+    <button class="start-btn" id="btn-start">
+      <span class="sb-label">게임 시작하기</span>
+      <span class="sb-sub">누르면 입장 QR이 나옵니다</span>
+    </button>
+  </div>
+
+  <div class="intro-keys">Space 바로 시작 · R 처음부터</div>
+</div>
+
+<div class="alert" id="alert" hidden></div>
+<!-- 연습 판 표시 (점수가 안 남는 판) -->
+<div class="연습띠" id="practice" hidden>연습 판 · 점수에 들어가지 않아요</div>
+
+<div class="screen">
+
+  <div class="top">
+    <div class="brand"><span class="b1" id="brand1"></span><span class="b2" id="brand2"></span></div>
+    <div class="stat" id="stat">서버 연결 중…</div>
+  </div>
+
+  <div class="body" id="view-lobby">
+
+    <section class="card enter">
+      <div class="code-box">
+        <div class="label">입장코드</div>
+        <div class="code mono" id="code">----</div>
+      </div>
+      <div class="qr"><img id="qr" alt="입장 QR코드"></div>
+      <div class="url" id="url">주소를 불러오는 중…</div>
+      <div class="alt" id="alt" hidden></div>
+    </section>
+
+    <section class="card lobby">
+      <h2 id="lobby-title">대기실 <span class="count" id="count">0</span>명</h2>
+      <div class="grid" id="grid"></div>
+      <div class="teamview" id="teamview" hidden></div>
+      <div class="empty" id="empty">휴대폰으로 QR을 찍고 입장코드를 넣어주세요</div>
+    </section>
+
+  </div>
+
+  <!-- 게임 보드 -->
+  <section class="board" id="view-board" hidden>
+    <h2 class="b-제목">게임 보드</h2>
+    <div class="b-블록들" id="board-blocks"></div>
+  </section>
+
+  <!-- 규칙 카드 -->
+  <section class="rulecard" id="view-rules" hidden>
+    <div class="rc-상자" id="rule-box"></div>
+  </section>
+
+  <!-- 게임 진행 (게임별 화면이 여기에 그려진다) -->
+  <section class="play" id="view-play" hidden></section>
+
+  <!-- 점수판 -->
+  <section class="scoreboard" id="view-score" hidden>
+    <h2 class="sb-제목">점수판 <span class="sb-기준" id="sb-mode"></span></h2>
+    <div class="sb-둘" id="sb-body"></div>
+  </section>
+
+  <!-- 아래에 늘 보이는 팀 순위 미니 점수판 (SPEC 3장) -->
+  <div class="mini" id="mini-score" hidden></div>
+
+  <div class="foot" id="foot">휴대폰 카메라로 QR을 찍거나, 브라우저에 위 주소를 직접 입력하세요</div>
+</div>
+
+<script src="/vendor/socket.io.js"></script>
+<!-- 인트로는 따로 싣는다. 모듈 스크립트는 서로 독립이라
+     인트로가 실패해도 screen.js(QR·대기실)는 그대로 돈다. -->
+<script type="module" src="/js/intro.js"></script>
+<script type="module" src="/js/screen.js"></script>
+</body>
+</html>
