@@ -128,7 +128,7 @@ console.log('\n[역할 배정]');
   }
 
   // 보드에 적히는 인원 범위
-  확인('받을 수 있는 인원은 8~12명', mafia.minPlayers === 8 && mafia.maxPlayers === 12,
+  확인('받을 수 있는 인원은 3~12명', mafia.minPlayers === 3 && mafia.maxPlayers === 12,
     `${mafia.minPlayers}~${mafia.maxPlayers}명`);
 
   let 서로다른팀 = 0;

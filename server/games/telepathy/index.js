@@ -22,7 +22,7 @@ export default {
   id: 'telepathy',
   name: '텔레파시',
   type: 'team',
-  minPlayers: 6,
+  minPlayers: 2,
   maxPlayers: 12,
   minutes: 10,
   color: '#14B8C4',

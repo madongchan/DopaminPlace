@@ -22,7 +22,7 @@ export default {
   id: 'bottlecap',
   name: '병뚜껑 던지기',
   type: 'offline',
-  minPlayers: 4,
+  minPlayers: 2,
   maxPlayers: 12,
   minutes: 15,
   color: '#22C55E',

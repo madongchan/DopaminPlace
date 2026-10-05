@@ -327,3 +327,12 @@ button.ghost { background: transparent; color: var(--text-dim); border: 2px soli
 .연습띠[hidden] { display: none; }
 #btn-team-edit { min-height: 0; height: auto; font-size: 16px; padding: 12px 18px; width: auto; }
 #btn-team-edit[hidden] { display: none; }
+
+/* ── 우주 바탕 통일 — 큰 화면과 같은 분위기 ── */
+.phone { text-shadow: 0 1px 4px rgba(0,0,0,.9); }
+button { text-shadow: none; }
+/* 큰 상자는 줄무늬 테두리 (base.css 의 --줄무늬) */
+.p-규칙상자, .p-제시어, .myteam {
+  border-style: solid; border-width: 6px; border-color: var(--ppt-gold);
+  -webkit-mask-box-image: var(--줄무늬) 24 fill / 6px / 0 round;
+}

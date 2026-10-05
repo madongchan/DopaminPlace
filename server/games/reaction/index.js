@@ -162,6 +162,7 @@ function 순위내기(s) {
       name: state.players[id]?.name || '',
       teamId: state.players[id]?.teamId || null,
       판수: (s.기록[id] || []).length,
+      이번판: (s.기록[id] || []).at(-1) ?? null,     // 방금 끝난 판의 기록 (평균에 가려지지 않게 따로 보낸다)
       기록: 개인기록(s.기록[id])
     }))
     .filter(x => x.기록 != null)

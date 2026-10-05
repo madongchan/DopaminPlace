@@ -4,15 +4,15 @@
 :root {
   /* ── 바탕: 워크숍 PPT의 따뜻한 차콜(#221E1F)을 훨씬 더 눌러 암흑으로 ── */
   --void:      #050405;   /* 인트로 암흑 */
-  --bg:        #0A0809;
-  --bg-2:      #121011;
-  --bg-3:      #1A1617;
-  --line:      #272122;
-  --line-2:    #362E30;
+  --bg:        #03040C;
+  --bg-2:      rgba(8,10,26,.86);    /* 우주 바탕 위에 얹는 반투명 남색 판 */
+  --bg-3:      rgba(24,29,56,.92);
+  --line:      #2A3358;
+  --line-2:    #3D4878;
 
   --text:      #EEEEEE;   /* 워크숍에서 그대로 가져온 밝은 회백 */
-  --text-dim:  #8A8183;
-  --text-dim2: #5A5355;
+  --text-dim:  #B4BAD0;   /* 우주 바탕 위에서도 읽히게 밝힘 */
+  --text-dim2: #8189A6;
 
   /* ── 강조: 워크숍 머스타드·코랄을 금속으로 변형 ── */
   --gold:      #E2BE27;   /* 도파민 = 보상. 워크숍 머스타드 그대로가 기준 */
@@ -64,9 +64,10 @@
    화면을 숨겼는데 자리를 계속 차지하는 사고를 막으려고 전역으로 못 박는다. */
 [hidden] { display: none !important; }
 
+/* body 에 바탕색을 칠하면 그 아래 깔린 우주 사진(body::before)을 덮어 버린다. html 에만 칠한다. */
+html { background: var(--bg); }
 html, body {
   margin: 0; padding: 0;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font);
   font-weight: 700;
@@ -76,9 +77,11 @@ html, body {
 /* 바탕 조명 — 아주 낮게 깔린 금빛. 예전처럼 알록달록하지 않게. */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+  /* 첫 화면과 같은 우주 사진을 모든 화면에 깐다. 글자가 읽히게 어둡게 한 겹 덮는다. */
   background:
-    radial-gradient(1400px 800px at 50% -20%, rgba(226,190,39,.07), transparent 64%),
-    radial-gradient(1100px 700px at 88% 106%, rgba(253,138,105,.05), transparent 62%);
+    linear-gradient(rgba(3,4,12,.58), rgba(3,4,12,.70)),
+    url('/images/intro/space.png') center / cover no-repeat,
+    #03040C;
 }
 
 /* 비네트 — 가장자리를 눌러 화면 가운데로 시선을 모은다 */
@@ -92,6 +95,15 @@ body::after {
   border: 1px solid var(--line);
   border-radius: var(--r);
   box-shadow: 0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.04);
+}
+
+/* ── 줄무늬 테두리 ──
+   첫 화면 아래의 사선 띠와 같은 모양을 상자 테두리에 입힌다.
+   테두리 자체는 평범한 실선이고 마스크로 사선 무늬만 남긴다 — 그래서 색은
+   그 상자의 border-color(팀·게임 형광색)를 그대로 따른다. 색이 없으면 금색.
+   마스크를 못 쓰는 브라우저에서는 그냥 실선으로 보인다. */
+:root {
+  --줄무늬: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><defs><pattern id='p' width='48' height='48' patternUnits='userSpaceOnUse'><rect width='48' height='48' fill-opacity='.2'/><path d='M0 0H26L0 26Z M48 0V26L26 48H0Z'/></pattern></defs><rect width='96' height='96' fill='url(%23p)'/><rect x='24' y='24' width='48' height='48'/></svg>");
 }
 
 .neon { color: var(--gold); }

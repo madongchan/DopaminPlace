@@ -53,9 +53,11 @@ function 쉬는중(el, view) {
       요소('span', { class: 'rt-바' }, [
         요소('i', { style: { width: `${(비율 * 100).toFixed(1)}%` } })
       ]),
-      요소('span', { class: 'rt-ms', text: `${x.기록}ms` })
+      // 이번 판 기록을 따로 보여준다 — 평균만 보이면 방금 1초를 받은 것이 가려진다
+      요소('span', { class: 'rt-이번' + (x.이번판 >= 1000 ? ' 나쁨' : ''), text: x.이번판 != null ? `이번 ${x.이번판}ms` : '' }),
+      요소('span', { class: 'rt-ms', text: `평균 ${x.기록}ms` })
     ]));
   }
   el.appendChild(wrap);
-  el.appendChild(요소('div', { class: 'tp-안내작게', text: '5판 중 잘한 3판의 평균이 기록입니다' }));
+  el.appendChild(요소('div', { class: 'tp-안내작게', text: '순위는 5판 중 잘한 3판의 평균으로 정합니다 · 초록 전에 누르거나 안 누르면 그 판은 1000ms' }));
 }

@@ -32,7 +32,7 @@ export default {
   id: 'mafia',
   name: '마피아',
   type: 'solo',
-  minPlayers: 8,
+  minPlayers: 3,     // 마피아 1 + 나머지 2 — 이보다 적으면 시작하자마자 마피아가 이긴다
   maxPlayers: 12,
   minutes: 30,
   color: '#A82F14',

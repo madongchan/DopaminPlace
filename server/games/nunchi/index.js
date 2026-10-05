@@ -19,7 +19,7 @@ export default {
   id: 'nunchi',
   name: '눈치 게임',
   type: 'solo',
-  minPlayers: 3,
+  minPlayers: 2,
   maxPlayers: 12,
   minutes: 5,
   color: '#8B5CF6',

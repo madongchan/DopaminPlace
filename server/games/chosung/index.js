@@ -27,7 +27,7 @@ export default {
   id: 'chosung',
   name: '초성 퀴즈',
   type: 'team',
-  minPlayers: 4,
+  minPlayers: 2,
   maxPlayers: 12,
   minutes: 10,
   color: '#FF8A00',

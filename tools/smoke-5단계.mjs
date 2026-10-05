@@ -284,6 +284,8 @@ console.log('\n[반응속도]');
   const 순위 = reaction.views(s).screen.순위
     .map(x => `${x.rank}위 ${x.name} ${x.기록}ms`).join(' / ');
   확인('순위가 나온다', 순위 === '1위 나 250ms / 2위 다 400ms / 3위 가 1000ms', 순위);
+  const 가 = reaction.views(s).screen.순위.find(x => x.name === '가');
+  확인('부정출발한 판은 이번 판 기록에 1000ms 로 나간다', 가?.이번판 === 1000, `${가?.이번판}ms`);
 
   // 좋은 3판 평균 (5판 중)
   const s2 = reaction.create();
