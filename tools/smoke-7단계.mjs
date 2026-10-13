@@ -187,6 +187,25 @@ console.log('\n[연습 문제는 진짜 문제와 겹치지 않는다]');
   확인('연습 문제 중 진짜 문제와 같은 것이 없다', 겹침.length === 0, 겹침.join(', ') || '겹침 없음');
 }
 
+// ══════════════════════════════════════════════════════════
+console.log('\n[끈끈이 동전잡기 — 진행자가 등수만 입력]');
+{
+  const { default: coin } = await import('../server/games/coin/index.js');
+  참가자세팅([['a', '가람', 'A'], ['b', '나래', 'A'], ['c', '다온', 'B'], ['e', '마루', 'C']]);
+  const s = coin.create();
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'B' } });
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'B' } });      // 같은 팀을 두 번
+  확인('같은 팀은 한 번만 들어간다', s.순위.join('') === 'B');
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });
+  coin.onAdmin(s, { action: '되돌리기' });
+  확인('되돌리면 마지막 입력이 빠진다', s.순위.join('') === 'B' && coin.views(s).admin.남은팀.join('') === 'AC');
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'A' } });
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });
+  const 점 = Object.fromEntries(coin.result(s).점수.map(x => [x.playerId, x.points]));
+  확인('1등 팀원 +5 · 2등 +3 · 3등 +1', 점.c === 5 && 점.a === 3 && 점.b === 3 && 점.e === 1,
+    `다온 ${점.c} · 가람 ${점.a} · 나래 ${점.b} · 마루 ${점.e}`);
+}
+
 // ── 뒷정리 ──────────────────────────────────────────────────
 for (const id of 쓴판) 비밀지우기(id);
 state.players = 원래.players;

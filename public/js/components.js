@@ -148,7 +148,7 @@ export function 점수표상자(c) {
   box.appendChild(요소('div', {
     class: '점수표-덧',
     text: c.개인전만 ? '개인 점수에만 들어갑니다 (팀 점수에는 들어가지 않음)'
-      : c.type === 'team' ? '팀 점수는 팀원 점수의 평균입니다'
+      : c.type !== 'solo' ? '팀 점수는 팀원 점수의 평균입니다'
       : '개인 점수와 팀 점수에 모두 들어갑니다'
   }));
   return box;

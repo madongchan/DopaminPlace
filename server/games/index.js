@@ -7,6 +7,7 @@ import nunchi from './nunchi/index.js';
 import reaction from './reaction/index.js';
 import mafia from './mafia/index.js';
 import liar from './liar/index.js';
+import coin from './coin/index.js';
 
 export const 게임목록 = [
   telepathy,
@@ -14,7 +15,8 @@ export const 게임목록 = [
   nunchi,
   reaction,
   mafia,
-  liar
+  liar,
+  coin
   // 남은 것: 이미지 맞히기
   // 10단계: 넌센스, 문장 맞추기, 천사혹은악마, 끝나는 말은?, 줄줄이 말해요
 ];
