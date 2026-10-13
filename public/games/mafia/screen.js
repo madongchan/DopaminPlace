@@ -21,6 +21,8 @@ const 단계안내 = {
   찬반투표: '처형에 찬성인지 반대인지 고르세요'
 };
 const 단계길이 = { 밤: 60, 아침: 20, 토론: 120, 지목투표: 30, 최후변론: 30, 찬반투표: 15 };
+// 하루가 흘러가는 순서. 화면 위쪽에 늘 띄워 지금 어디인지, 다음이 무엇인지 보이게 한다.
+const 흐름 = [['밤', '밤'], ['아침', '아침'], ['토론', '토론'], ['지목투표', '지목 투표'], ['최후변론', '최후 변론'], ['찬반투표', '찬반 투표']];
 
 export function 그리기(el, { view, name }, 화면뷰) {
   비우기(el);
@@ -33,6 +35,10 @@ export function 그리기(el, { view, name }, 화면뷰) {
   ]));
 
   if (view.결과) { 끝화면(el, view, 팀); return; }
+
+  // 하루의 흐름 — 지금 단계에 불이 들어온다
+  el.appendChild(요소('div', { class: 'mf-흐름' }, 흐름.map(([id, 글]) =>
+    요소('span', { class: 'mf-흐름칸' + (id === view.phase ? ' 지금' : ''), text: 글 }))));
 
   // 단계 이름 + 타이머
   el.appendChild(요소('div', { class: 'mf-단계' }, [
@@ -144,7 +150,8 @@ function 사람들칸(view, 팀) {
 
 function 기록칸(view) {
   const wrap = 요소('div', { class: 'mf-기록' });
-  for (const 줄 of (view.기록 || []).slice(-3)) {
+  // 위쪽에 단계 흐름이 생겨 자리가 줄었다 — 두 줄만 보여준다(세 줄이면 아래 팀 순위와 겹친다)
+  for (const 줄 of (view.기록 || []).slice(-2)) {
     wrap.appendChild(요소('div', { class: 'mf-기록줄', text: 줄 }));
   }
   return wrap;

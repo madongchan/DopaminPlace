@@ -29,14 +29,12 @@ export function 그리기(el, { view, name }, 화면뷰) {
     ]));
   }
 
-  // 힌트 (15초가 지나면 열린다)
+  // 힌트 — 처음부터 초성과 함께 보여준다
   if (view.힌트) {
     el.appendChild(요소('div', { class: 'cs-힌트' }, [
       요소('span', { class: 'cs-힌트말', text: '힌트' }),
       요소('span', { text: view.힌트 })
     ]));
-  } else if (view.phase === 'input') {
-    el.appendChild(요소('div', { class: 'cs-힌트 닫힘', text: '15초가 지나면 힌트가 열립니다' }));
   }
 
   el.appendChild(맞힌칸(view, 팀));
@@ -50,7 +48,7 @@ function 맞힌칸(view, 팀) {
   if (!맞힌.length) {
     wrap.appendChild(요소('div', {
       class: 'tp-답없음',
-      text: view.phase === 'input' ? '아직 맞힌 팀이 없습니다' : '아무도 못 맞혔습니다'
+      text: view.phase === 'input' ? '가장 먼저 맞힌 팀만 점수를 얻습니다' : '아무도 못 맞혔습니다'
     }));
     return wrap;
   }
@@ -59,7 +57,7 @@ function 맞힌칸(view, 팀) {
     const 색 = 팀색(t.colorId);
     const 글자색 = 팀글자색(t.colorId);
     wrap.appendChild(요소('div', { class: 'cs-맞힌칸', style: { borderColor: 색 } }, [
-      요소('span', { class: 'cs-맞힌순서', text: `${x.순서}등` }),
+      요소('span', { class: 'cs-맞힌순서', text: '정답' }),
       요소('span', { class: 'cs-맞힌팀', text: t.name || `${x.teamId}팀`, style: { color: 글자색 } }),
       요소('span', { class: 'cs-맞힌이름', text: x.name }),
       요소('span', { class: 'cs-맞힌점', text: `+${x.점수}`, style: { color: 글자색 } }),

@@ -62,12 +62,18 @@ export function 마지막되돌리기() {
 // 누적(total): 모든 플레이의 합
 // 최고(best):  게임별로 그 사람이 가장 잘한 플레이만
 // 최근(latest): 게임별로 가장 최근 플레이만
-export function 개인점수(mode = state.settings.scoreMode) {
+// 개인전만 반영하는 게임(마피아·라이어)의 id. 이 게임에서 얻은 점수는 개인 순위에만 들어가고
+// 팀 점수에는 넣지 않는다. 게임 목록을 아는 server/index.js 가 시작할 때 정해준다.
+let 팀제외게임 = new Set();
+export function 팀점수제외설정(ids) { 팀제외게임 = new Set(ids); }
+
+export function 개인점수(mode = state.settings.scoreMode, { 팀용 = false } = {}) {
   // playerId → gameId → playId → { 합, 마지막시각 }
   const 묶음 = new Map();
 
   for (const r of state.scoreLog) {
     if (!state.players[r.playerId]) continue;      // 내보낸 사람은 뺀다
+    if (팀용 && 팀제외게임.has(r.gameId)) continue; // 팀 점수를 낼 때는 개인전 전용 게임을 뺀다
     if (!묶음.has(r.playerId)) 묶음.set(r.playerId, new Map());
     const 게임별 = 묶음.get(r.playerId);
     if (!게임별.has(r.gameId)) 게임별.set(r.gameId, new Map());
@@ -98,8 +104,9 @@ export function 개인점수(mode = state.settings.scoreMode) {
 }
 
 // 팀 점수 = 팀원 개인 점수의 평균 (인원이 달라도 공정하게, SPEC 7장)
+// 단, 개인전 전용 게임(마피아·라이어)에서 얻은 점수는 빼고 평균을 낸다.
 export function 팀점수(mode = state.settings.scoreMode) {
-  const 개인 = 개인점수(mode);
+  const 개인 = 개인점수(mode, { 팀용: true });
   const 결과 = {};
   for (const id of Object.keys(state.teams)) {
     const 원들 = 팀원들(id);

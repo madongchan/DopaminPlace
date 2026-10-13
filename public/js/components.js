@@ -126,6 +126,34 @@ export function 카드그리드(목록, { 팀정보 = {} } = {}) {
   return grid;
 }
 
+// ── 규칙 카드 (TV·휴대폰·진행자가 같이 쓴다) ────────────────
+// 규칙 한 줄. "밤 — 모두 …" 처럼 ' — ' 앞에 짧은 머리말이 있으면 굵게 띄운다.
+export function 규칙줄(글) {
+  const i = String(글).indexOf(' — ');
+  if (i < 1 || i > 12) return 요소('li', { text: 글 });
+  return 요소('li', {}, [요소('b', { class: '규칙머리', text: 글.slice(0, i) }), 글.slice(i + 3)]);
+}
+
+// 점수표 — 무엇을 하면 몇 점인지 한눈에. c: 서버가 준 current (점수표·개인전만·type)
+export function 점수표상자(c) {
+  const 표 = c?.점수표 || [];
+  if (!표.length) return null;
+  const box = 요소('div', { class: '점수표' }, [요소('div', { class: '점수표-제목', text: '점수' })]);
+  for (const [무엇, 몇점] of 표) {
+    box.appendChild(요소('div', { class: '점수표-줄' }, [
+      요소('span', { class: '점수표-무엇', text: 무엇 }),
+      요소('b', { class: '점수표-점', text: 몇점 })
+    ]));
+  }
+  box.appendChild(요소('div', {
+    class: '점수표-덧',
+    text: c.개인전만 ? '개인 점수에만 들어갑니다 (팀 점수에는 들어가지 않음)'
+      : c.type === 'team' ? '팀 점수는 팀원 점수의 평균입니다'
+      : '개인 점수와 팀 점수에 모두 들어갑니다'
+  }));
+  return box;
+}
+
 // ── 팀 정보를 id로 찾기 쉽게 ────────────────────────────────
 export function 팀사전(teams = []) {
   return Object.fromEntries((teams || []).map(t => [t.id, t]));

@@ -19,6 +19,11 @@ export default {
   id: 'nunchi',
   name: '눈치 게임',
   type: 'solo',
+  점수표: [
+    ['판마다 살아남으면', '판 점수 +2 (3판 합산)'],
+    ['판 점수 합계 1위 / 2위 / 3위', '+5 / +3 / +2'],
+    ['그 밖의 참가자', '+1']
+  ],
   minPlayers: 2,
   maxPlayers: 12,
   minutes: 5,

@@ -1,6 +1,6 @@
 // 진행자 화면 — PIN 로그인, 단계별 진행(입장 → 팀 → 게임), 세부 관리.
 // 모든 조작은 서버로 보내고, 화면은 서버가 돌려준 뷰를 그린다.
-import { 요소, 비우기, 순위막대, 팀사전, 팀색 } from '/js/components.js';
+import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자 } from '/js/components.js';
 
 const socket = io();
 const $ = (id) => document.getElementById(id);
@@ -94,6 +94,7 @@ function 그리기(v) {
 
   단계그리기(v);
   시트상태그리기(v);
+  저장상태그리기(v);
   참가자그리기(v);
   팀그리기(v);
   보드그리기(v);
@@ -261,8 +262,10 @@ async function 게임그리기(v) {
   if (c.phase === 'rules') {
     $('s3-guide').textContent = '규칙을 읽어준 뒤 시작을 누르세요. 처음 하는 게임이면 연습으로 한 판 해보세요(점수가 남지 않습니다).';
     const ul = 요소('ul', { class: 'a-규칙' });
-    for (const r of c.rules || []) ul.appendChild(요소('li', { text: r }));
+    for (const r of c.rules || []) ul.appendChild(규칙줄(r));
     body.appendChild(ul);
+    const 점수표 = 점수표상자(c);
+    if (점수표) body.appendChild(점수표);
     btns.appendChild(요소('button', { class: 'a-큰버튼', text: '시작', onclick: () => 보내기('게임시작', {}, '게임을 시작했습니다.') }));
     btns.appendChild(요소('button', {
       class: 'a-큰버튼 둘째', text: '연습으로 시작',
@@ -430,6 +433,27 @@ $('btn-undo').onclick = () => {
 
 
 // ── 구글시트 상태 (SPEC 6장 「시트 동기화 상태」) ───────────
+// ── 데이터 초기화 ───────────────────────────────────────────
+$('btn-wipe-score').onclick = () => {
+  if (!confirm('점수와 게임 기록을 전부 지웁니다. 참가자와 팀은 그대로 둡니다.\n되돌릴 수 없어요. 계속할까요?')) return;
+  보내기('초기화', { 범위: '점수' }, '점수와 게임 기록을 지웠습니다.');
+};
+$('btn-wipe-all').onclick = () => {
+  if (!confirm('참가자·팀·점수를 전부 지우고 처음 상태로 돌립니다.\n모든 휴대폰이 다시 입장해야 해요. 되돌릴 수 없어요. 계속할까요?')) return;
+  if (!confirm('정말 전부 지울까요? (행사 도중이라면 취소하세요)')) return;
+  sessionStorage.removeItem('dopa.adminStep');
+  보내기('초기화', { 범위: '전체' }, '전부 지웠습니다. 입장코드가 새로 나왔어요.');
+};
+
+function 저장상태그리기(v) {
+  const s = v.저장;
+  if (!s) return;
+  const 크기 = s.바이트 < 1024 * 1024
+    ? `${Math.max(1, Math.round(s.바이트 / 1024))}KB`
+    : `${(s.바이트 / 1024 / 1024).toFixed(1)}MB`;
+  $('a-storage').textContent = `지금 서버에 저장된 데이터: ${크기} · 참가자 ${s.참가자}명 · 점수 기록 ${s.점수줄}줄`;
+}
+
 function 시트상태그리기(v) {
   const el = $('a-sheet');
   const s = v.sheet;

@@ -103,7 +103,7 @@ function 공개(el, view) {
     const box = 요소('div', { class: 'p-공개' });
     for (const x of 맞힌) {
       box.appendChild(요소('div', { class: 'p-공개줄' }, [
-        요소('span', { text: `${x.순서}등 ${x.teamId}팀 (${x.name})` }),
+        요소('span', { text: `정답! ${x.name}` }),
         요소('b', { text: `+${x.점수}` })
       ]));
     }

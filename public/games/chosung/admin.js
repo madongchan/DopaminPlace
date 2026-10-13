@@ -40,7 +40,7 @@ export function 그리기(el, current, 조작, 진행자뷰) {
       맞힌줄.appendChild(요소('span', {
         class: 'a-cs칩',
         style: { borderColor: 팀색(t.colorId), color: 팀글자색(t.colorId) },
-        text: `${x.순서}등 ${t.name || x.teamId + '팀'} ${x.name} +${x.점수}${x.인정 ? ' (인정)' : ''}`
+        text: `${t.name || x.teamId + '팀'} ${x.name} +${x.점수}${x.인정 ? ' (인정)' : ''}`
       }));
     }
   } else {
@@ -63,7 +63,7 @@ export function 그리기(el, current, 조작, 진행자뷰) {
   } else {
     box.appendChild(요소('p', {
       class: 'a-도움',
-      text: '뜻이 맞는데 표기만 다르면 「정답 인정」을 누르세요. 그 팀에 순서대로 점수가 들어갑니다.'
+      text: '뜻이 맞는데 표기만 다르면 「정답 인정」을 누르세요. 아직 아무도 못 맞힌 문제라면 그 팀이 점수를 얻습니다.'
     }));
     for (const o of 오답) {
       const t = 팀[o.teamId] || {};
@@ -79,7 +79,7 @@ export function 그리기(el, current, 조작, 진행자뷰) {
               class: 'xs', text: '정답 인정',
               onclick: () => 조작('정답인정', { 번호: o.번호 })
             })
-          : 요소('span', { class: 'a-도움', text: '이 팀은 이미 맞힘' })
+          : 요소('span', { class: 'a-도움', text: '이미 맞힌 팀이 있음' })
       ]));
     }
   }
@@ -88,9 +88,6 @@ export function 그리기(el, current, 조작, 진행자뷰) {
   // 버튼
   const 버튼들 = 요소('div', { class: 'rowbtns' });
   if (view.phase === 'input') {
-    if (!view.힌트) {
-      버튼들.appendChild(요소('button', { class: 'sm ghost', text: '힌트 열기', onclick: () => 조작('힌트') }));
-    }
     버튼들.appendChild(요소('button', { class: 'sm ghost', text: '+15초', onclick: () => 조작('시간추가', { 초: 15 }) }));
     버튼들.appendChild(요소('button', { class: 'sm', text: '정답 공개', onclick: () => 조작('공개') }));
   } else if (view.round >= view.총라운드) {

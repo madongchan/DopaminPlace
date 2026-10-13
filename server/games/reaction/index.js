@@ -18,6 +18,11 @@ export default {
   id: 'reaction',
   name: '반응속도',
   type: 'solo',
+  점수표: [
+    ['잘한 3판 평균이 빠른 순 1위 / 2위 / 3위', '+5 / +3 / +2'],
+    ['그 밖의 참가자', '+1'],
+    ['초록 전에 누르거나 안 누른 판', '1000ms로 기록']
+  ],
   minPlayers: 2,
   maxPlayers: 12,
   minutes: 5,

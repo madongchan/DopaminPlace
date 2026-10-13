@@ -355,7 +355,7 @@ body { overflow: hidden; height: 100vh; }
 .rc-종류 { font-size: 26px; color: var(--text-dim); font-weight: 800; letter-spacing: .1em; }
 .rc-이름 { font-size: 88px; line-height: 1; }
 .rc-규칙 { margin: 8px 0 0; padding-left: 34px; display: flex; flex-direction: column; gap: 16px; }
-.rc-규칙 li { font-size: 34px; line-height: 1.4; }
+.rc-규칙 li { font-size: 30px; line-height: 1.4; }
 .rc-대기 {
   margin-top: 16px; font-size: 26px; color: var(--text-dim);
   animation: 깜빡 1.8s infinite;
@@ -545,50 +545,8 @@ body { overflow: hidden; height: 100vh; }
   background: var(--gold-lo); color: var(--gold-hi); font-size: 18px;
 }
 
-/* ── 병뚜껑 던지기 ─────────────────────────────────────── */
-.bc-차례 {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  margin: 10px 0 18px; padding: 22px 28px;
-  background: var(--bg-2); border: 3px solid var(--line-2); border-radius: var(--r);
-}
-.bc-차례말 { font-size: 22px; color: var(--text-dim); }
-.bc-차례이름 { font-size: 8.4vh; line-height: 1.05; }
-.bc-차례팀 { font-size: 26px; color: var(--text-dim); }
-.bc-기회 { display: flex; gap: 12px; margin-top: 10px; }
-.bc-뚜껑 {
-  width: 34px; height: 34px; border-radius: 50%;
-  border: 3px solid var(--line-2); background: var(--line);
-}
-.bc-뚜껑.씀 { opacity: .3; }
-.bc-이번 { display: flex; gap: 10px; margin-top: 12px; }
-.bc-이번점 {
-  padding: 6px 16px; border-radius: var(--r-s);
-  background: var(--bg-3); border: 1px solid var(--line-2);
-  font-size: 30px; font-variant-numeric: tabular-nums;
-}
-.bc-이번점.빵 { color: var(--text-dim2); }
-.bc-다음 { margin-top: 12px; font-size: 24px; color: var(--text-dim); }
 
-.bc-팀들 { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
-.bc-팀칸 {
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  min-width: 190px; padding: 14px 20px;
-  background: var(--bg-2); border: 2px solid var(--line-2); border-radius: var(--r);
-}
-.bc-팀이름 { font-size: 24px; }
-.bc-팀평균 { font-size: 52px; line-height: 1; font-variant-numeric: tabular-nums; }
-.bc-팀셈 { font-size: 19px; color: var(--text-dim2); }
 
-.bc-개인 h3 { margin: 0 0 8px; font-size: 22px; color: var(--text-dim); }
-.bc-개인줄 {
-  display: grid; grid-template-columns: 1fr 110px 130px;
-  align-items: center; gap: 12px;
-  padding: 3px 0; border-bottom: 1px solid var(--line);
-  font-size: 21px;
-}
-.bc-개인이름 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bc-개인총 { text-align: right; font-variant-numeric: tabular-nums; }
-.bc-개인최고 { text-align: right; color: var(--text-dim2); font-size: 20px; }
 
 /* ══════════════════════════════════════════════════════════
    마피아 — 큰 화면
@@ -694,13 +652,75 @@ body { overflow: hidden; height: 100vh; }
 .foot, .b-제목 { text-shadow: 0 2px 6px #000, 0 0 22px #000; }
 
 /* 큰 상자는 줄무늬 테두리 (base.css 의 --줄무늬). 색은 각 상자의 border-color 그대로. */
-.card, .tv-card, .b-블록, .rc-상자, .tp-제시어, .tp-팀카드, .bc-차례 {
+.card, .tv-card, .b-블록, .rc-상자, .tp-제시어, .tp-팀카드 {
   border-style: solid; border-width: 10px; border-color: var(--ppt-gold);
   -webkit-mask-box-image: var(--줄무늬) 24 fill / 10px / 0 round;
 }
 /* 작은 상자는 테두리를 가늘게 */
-.제출칸, .bc-팀칸, .cs-맞힌칸, .nc-칸 {
+.제출칸, .cs-맞힌칸, .nc-칸 {
   border-style: solid; border-width: 6px; border-color: var(--ppt-gold);
   -webkit-mask-box-image: var(--줄무늬) 24 fill / 6px / 0 round;
 }
 .nc-칸.탈락 { border-color: var(--line-2); }
+
+/* ══════════════════════════════════════════════════════════
+   규칙 카드 — 왼쪽 규칙, 오른쪽 점수표
+   ══════════════════════════════════════════════════════════ */
+.rc-상자 {
+  width: min(1740px, 96%); display: grid; grid-template-columns: 1.5fr 1fr;
+  gap: 24px 52px; padding: 40px 56px; align-items: start;
+}
+.rc-상자.한칸 { width: min(1100px, 88%); grid-template-columns: 1fr; }
+.rc-왼 { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.rc-오 { align-self: center; }
+.rc-오 .점수표 { font-size: 28px; }
+.rc-이름 { font-size: 72px; }
+.rc-규칙 { gap: 12px; }
+.rc-대기 { grid-column: 1 / -1; margin-top: 0; }
+
+/* ── 위쪽 입장 안내 (대기실이 아닐 때) — 작은 QR과 입장코드 ── */
+.top-right { display: flex; align-items: center; gap: 28px; }
+.join-chip {
+  display: flex; align-items: center; gap: 16px; padding: 8px 22px 8px 8px;
+  background: rgba(3,5,16,.78); border-radius: 16px;
+}
+.join-chip img {
+  width: 112px; height: 112px; display: block; background: #fff;
+  border-radius: 10px; padding: 5px; image-rendering: pixelated;
+}
+.jc-글 { display: flex; flex-direction: column; line-height: 1.1; }
+.jc-글 span { font-size: 22px; color: var(--text-dim); }
+.jc-글 b { font-size: 46px; color: var(--ppt-gold); letter-spacing: .1em; }
+
+/* ── 단계 흐름 (마피아·라이어) — 지금 단계에 불이 들어온다 ── */
+.mf-흐름 { display: flex; justify-content: center; align-items: center; gap: 36px; }
+.mf-흐름칸 {
+  position: relative; font-size: 24px; padding: 6px 20px; border-radius: 999px;
+  background: var(--bg-3); color: var(--text-dim2);
+}
+.mf-흐름칸 + .mf-흐름칸::before {
+  content: '›'; position: absolute; left: -26px; top: 50%; transform: translateY(-54%);
+  color: var(--text-dim2); font-size: 30px;
+}
+.mf-흐름칸.지금 { background: var(--ppt-gold); color: #1A1204; text-shadow: none; }
+
+/* ══════════════════════════════════════════════════════════
+   라이어 게임 — 큰 화면
+   ══════════════════════════════════════════════════════════ */
+.lr-카테고리 { display: flex; align-items: baseline; justify-content: center; gap: 18px; }
+.lr-카테고리말 { font-size: 26px; color: var(--text-dim); }
+.lr-카테고리글 { font-size: 64px; color: var(--ppt-gold); }
+.mf-사람.lr-끝 { opacity: .45; }
+.mf-사람.lr-지금 { border-color: var(--ppt-gold); }
+.mf-사람.lr-지금 .mf-사람이름 { color: var(--ppt-gold); }
+.lr-공개 { display: flex; justify-content: center; gap: 28px; }
+.lr-공개칸 {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  min-width: 320px; padding: 18px 36px; background: var(--bg-2); border-radius: var(--r);
+}
+.lr-공개말 { font-size: 24px; color: var(--text-dim); }
+.lr-공개칸 b { font-size: 60px; }
+.lr-칩제목 { font-size: 22px; color: var(--text-dim); align-self: center; margin-right: 6px; }
+
+/* 게임 화면 내용이 길어져도 아래 팀 순위 위로 흘러넘치지 않게 한다 */
+.play { overflow: hidden; }

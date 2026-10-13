@@ -1,6 +1,6 @@
 // 참가자 휴대폰 — 입장, 복귀, 팀 편성.
 // 화면은 서버가 보낸 뷰(view)를 그리기만 한다.
-import { 요소, 비우기 } from '/js/components.js';
+import { 요소, 비우기, 규칙줄, 점수표상자 } from '/js/components.js';
 
 const socket = io();
 const $ = (id) => document.getElementById(id);
@@ -224,8 +224,10 @@ function 규칙카드(c) {
   box.style.borderColor = c.color;
   box.appendChild(요소('div', { class: 'p-규칙이름', text: c.name, style: { color: c.color } }));
   const ul = 요소('ul', { class: 'p-규칙들' });
-  for (const r of c.rules || []) ul.appendChild(요소('li', { text: r }));
+  for (const r of c.rules || []) ul.appendChild(규칙줄(r));
   box.appendChild(ul);
+  const 점수표 = 점수표상자(c);
+  if (점수표) box.appendChild(점수표);
   box.appendChild(요소('div', { class: 'wait', text: '진행자가 규칙을 설명하는 중이에요. 곧 시작합니다' }));
 }
 

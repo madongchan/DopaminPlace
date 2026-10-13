@@ -18,7 +18,7 @@
     <input id="in-pin" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" autocomplete="off">
     <div class="err" id="err-login"></div>
     <button id="btn-login">들어가기</button>
-    <p class="hint">기본 PIN은 <b>0000</b>입니다. <code>.env</code>의 <code>ADMIN_PIN</code>으로 바꿀 수 있어요.</p>
+    <p class="hint">진행자가 정한 PIN을 넣어주세요. PIN은 서버의 <code>ADMIN_PIN</code> 설정값입니다.<br>(내 컴퓨터에서 직접 켠 서버만 기본값 0000을 씁니다)</p>
   </div>
 </div>
 
@@ -90,7 +90,7 @@
 
   <!-- 평소엔 열 필요 없는 세부 기능 -->
   <details class="card pane a-고급" id="adv">
-    <summary>고급 · 세부 관리 <span>이름 수정, 기기 연결, 내보내기, 팀원 이동, 직접 팀 고르기, 점수 되돌리기</span></summary>
+    <summary>고급 · 세부 관리 <span>이름 수정, 기기 연결, 내보내기, 팀원 이동, 직접 팀 고르기, 점수 되돌리기, 데이터 초기화</span></summary>
 
     <div class="cols">
 
@@ -129,6 +129,14 @@
         <div class="rowbtns">
           <span class="a-시트" id="a-sheet"></span>
           <button class="sm ghost" id="btn-sync">지금 동기화</button>
+        </div>
+
+        <h2 class="a-둘째">데이터 초기화</h2>
+        <p class="a-도움" id="a-storage"></p>
+        <p class="a-도움">테스트·리허설 기록을 지우고 본 행사를 시작할 때 씁니다. 되돌릴 수 없어요.</p>
+        <div class="rowbtns">
+          <button class="sm danger" id="btn-wipe-score">점수·게임 기록만 지우기</button>
+          <button class="sm danger" id="btn-wipe-all">전부 지우기 (참가자·팀 포함)</button>
         </div>
       </section>
 

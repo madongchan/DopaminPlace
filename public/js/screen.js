@@ -3,7 +3,7 @@
 // 인트로(js/intro.js)는 screen.html에서 따로 싣는다.
 // 모듈 스크립트는 서로 독립이라 인트로가 죽어도 이 파일은 계속 돈다.
 
-import { 요소, 비우기, 순위막대, 팀사전, 팀색 } from '/js/components.js';
+import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자 } from '/js/components.js';
 
 const socket = io();
 const $ = (id) => document.getElementById(id);
@@ -35,7 +35,8 @@ let 이전주소 = null;
 socket.on('screen', (view) => {
   $('code').textContent = view.joinCode;
   $('url').textContent = view.url;
-  if (view.qr) $('qr').src = view.qr;
+  if (view.qr) { $('qr').src = view.qr; $('qr-mini').src = view.qr; }
+  $('code-mini').textContent = view.joinCode;
 
   // 주소가 바뀌면(와이파이 변경·자리 이동) 크게 알린다.
   if (이전주소 && 이전주소 !== view.url) 알림(`접속 주소가 바뀌었습니다 · QR을 다시 찍어주세요`);
@@ -159,6 +160,9 @@ function 구역보이기(id) {
   $('foot').hidden = (id !== 'view-lobby');
   // 미니 점수판은 보드·게임에서만
   $('mini-score').hidden = !(id === 'view-board' || id === 'view-play');
+  // 대기실에는 큰 QR이 있다. 보드·규칙 카드·점수판에서는 위쪽에 작은 QR과 입장코드를 띄워
+  // 팀을 나눈 뒤에 온 사람도 들어올 수 있게 한다. (게임 중에는 화면을 가리지 않게 숨긴다)
+  $('join-chip').hidden = !(id === 'view-board' || id === 'view-rules' || id === 'view-score');
 }
 
 let 지금게임 = null;        // 지금 그리고 있는 게임 화면 모듈
@@ -227,11 +231,17 @@ function 보드그리기(view) {
 function 규칙카드그리기(c) {
   const box = 비우기($('rule-box'));
   box.style.borderColor = c.color;
-  box.appendChild(요소('div', { class: 'rc-종류', text: 종류글[c.type] || c.type }));
-  box.appendChild(요소('div', { class: 'rc-이름', text: c.name, style: { color: c.color } }));
+  // 왼쪽: 규칙, 오른쪽: 점수표 — 무엇을 하면 몇 점인지 규칙과 나란히 보인다
   const ul = 요소('ul', { class: 'rc-규칙' });
-  for (const r of c.rules || []) ul.appendChild(요소('li', { text: r }));
-  box.appendChild(ul);
+  for (const r of c.rules || []) ul.appendChild(규칙줄(r));
+  const 점수표 = 점수표상자(c);
+  box.classList.toggle('한칸', !점수표);
+  box.appendChild(요소('div', { class: 'rc-왼' }, [
+    요소('div', { class: 'rc-종류', text: 종류글[c.type] || c.type }),
+    요소('div', { class: 'rc-이름', text: c.name, style: { color: c.color } }),
+    ul
+  ]));
+  if (점수표) box.appendChild(요소('div', { class: 'rc-오' }, [점수표]));
   box.appendChild(요소('div', { class: 'rc-대기', text: '진행자가 시작을 누르면 시작합니다' }));
 }
 
@@ -241,6 +251,7 @@ async function 게임그리기(view, c) {
   if (지금게임id !== c.gameId) {
     지금게임 = null;
     지금게임id = c.gameId;
+    el.classList.remove('밤중');      // 마피아가 밤에 끝났으면 다음 게임까지 어두운 채로 남는다
     try {
       지금게임 = await import(`/games/${c.gameId}/screen.js`);
     } catch (err) {

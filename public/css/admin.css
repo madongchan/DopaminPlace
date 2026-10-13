@@ -212,25 +212,6 @@ button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt
 .a-cs오답팀 { color: var(--text-dim); }
 .a-cs오답글 { font-size: 16px; }
 
-/* ── 병뚜껑 던지기 ─────────────────────────────────────── */
-.a-bc판정 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; }
-.a-bc점 {
-  padding: 22px 0;
-  font-family: var(--font); font-weight: 700; font-size: 26px;
-  color: #1A1204; background: var(--gold);
-  border: none; border-radius: var(--r-s);
-  touch-action: manipulation;
-}
-.a-bc점:active { transform: translateY(2px); }
-.a-bc점.빵 { background: var(--line-2); color: var(--text); }
-.a-bc팀 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0; }
-.a-bc순서 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 12px 0; }
-.a-bc순서칸 {
-  padding: 5px 10px; border-radius: 999px;
-  background: var(--bg-3); border: 1px solid var(--line-2); font-size: 13px;
-}
-.a-bc순서칸.끝남 { opacity: .42; }
-.a-bc순서칸.지금 { border-color: var(--gold); color: var(--gold); }
 
 /* ══════════════════════════════════════════════════════════
    단계형 진행 — ① 입장 받기 → ② 팀 나누기 → ③ 게임 진행
@@ -270,6 +251,7 @@ button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt
 
 /* 고급 · 세부 관리 (접힘) */
 .a-고급 { border-style: dashed; }
+#game-body .점수표 { font-size: 15px; margin: 12px 0; max-width: 640px; }
 .a-고급 > summary { cursor: pointer; font-size: 17px; font-weight: 900; color: var(--text-dim); }
 .a-고급 > summary span { font-size: 13px; font-weight: 700; margin-left: 10px; color: var(--text-dim2); }
 .a-고급[open] > summary { margin-bottom: 18px; }

@@ -95,7 +95,8 @@ button.ghost { background: transparent; color: var(--text-dim); border: 2px soli
 }
 .p-규칙이름 { font-size: 34px; font-weight: 900; }
 .p-규칙들 { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 12px; }
-.p-규칙들 li { font-size: 17px; line-height: 1.5; font-weight: 700; }
+.p-규칙들 li { font-size: 16px; line-height: 1.5; font-weight: 700; }
+.p-규칙상자 .점수표 { font-size: 15px; }
 
 .p-라운드 { font-size: 15px; color: var(--ppt-gold); font-weight: 900; letter-spacing: .08em; }
 .p-제시어 {
@@ -204,37 +205,14 @@ button.ghost { background: transparent; color: var(--text-dim); border: 2px soli
 .cs-p맞음.없음 { color: var(--text-dim2); font-size: 22px; }
 .cs-p정답 { margin: 18px 0 6px; text-align: center; font-size: 42px; color: var(--ok); }
 
-/* ── 병뚜껑 던지기 ─────────────────────────────────────── */
-.bc-p내차례 {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  margin: 16px 0 10px; padding: 34px 20px;
-  background: var(--gold); border-radius: var(--r);
-  box-shadow: 0 10px 0 var(--gold-lo);
-  animation: 차례맥박 1.3s ease-in-out infinite;
-}
 
 /* 투명도를 낮추면 글자가 흐려 안 읽힌다. 바깥 빛만 뛰게 한다. */
 @keyframes 차례맥박 {
   0%, 100% { box-shadow: 0 10px 0 var(--gold-lo), 0 0 0 0 rgba(226,190,39,.55); }
   50%      { box-shadow: 0 10px 0 var(--gold-lo), 0 0 0 18px rgba(226,190,39,0); }
 }
-.bc-p내차례글 { font-size: 52px; color: #1A1204; }
-.bc-p기회 { font-size: 22px; color: #3A2A06; }
 
-.bc-p기다림 {
-  display: flex; flex-direction: column; align-items: center; gap: 4px;
-  margin: 20px 0 10px; padding: 22px 18px;
-  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r);
-}
-.bc-p기다림말 { font-size: 15px; color: var(--text-dim); }
-.bc-p기다림이름 { font-size: 40px; }
 
-.bc-p기록 {
-  display: flex; justify-content: space-between; gap: 10px;
-  margin-top: 14px; padding: 12px 16px;
-  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--r-s);
-  font-size: 17px; color: var(--text-dim);
-}
 
 /* ══════════════════════════════════════════════════════════
    마피아 — 휴대폰

@@ -85,7 +85,14 @@
 
   <div class="top">
     <div class="brand"><span class="b1" id="brand1"></span><span class="b2" id="brand2"></span></div>
-    <div class="stat" id="stat">서버 연결 중…</div>
+    <div class="top-right">
+      <!-- 대기실이 아닐 때도 늦게 온 사람이 들어올 수 있게 입장 QR·코드를 작게 띄워 둔다 -->
+      <div class="join-chip" id="join-chip" hidden>
+        <img id="qr-mini" alt="입장 QR코드">
+        <div class="jc-글"><span>입장코드</span><b class="mono" id="code-mini">----</b></div>
+      </div>
+      <div class="stat" id="stat">서버 연결 중…</div>
+    </div>
   </div>
 
   <div class="body" id="view-lobby">

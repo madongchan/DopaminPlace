@@ -123,6 +123,19 @@ export function 저장() {
   }, 200);
 }
 
+// data 폴더에 쌓인 양 — 진행자 화면에 보여준다(데이터가 얼마나 쌓였는지 눈으로 확인하게).
+export function 저장크기() {
+  const 폴더 = path.dirname(상태파일);
+  let 바이트 = 0;
+  try {
+    for (const 이름 of fs.readdirSync(폴더)) {
+      const 정보 = fs.statSync(path.join(폴더, 이름));
+      if (정보.isFile()) 바이트 += 정보.size;
+    }
+  } catch { /* 폴더가 아직 없으면 0 */ }
+  return { 바이트, 참가자: Object.keys(state.players).length, 점수줄: state.scoreLog.length };
+}
+
 export function 복원() {
   try {
     if (!fs.existsSync(상태파일)) return false;

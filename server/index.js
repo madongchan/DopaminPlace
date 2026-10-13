@@ -11,16 +11,20 @@ import {
   state, 입장코드생성, 참가자추가, 이름중복, 토큰으로찾기,
   접속상태변경, 참가자공개목록, 내정보, 복원, 저장, 참가자삭제,
   팀초기화, 팀요약, 랜덤팀배정, 팀직접선택, 팀강제이동, 팀해산,
-  팀설정, 이름PIN으로찾기, 이름변경, 토큰재발급, 색hex, 팀기본값채우기
+  팀설정, 이름PIN으로찾기, 이름변경, 토큰재발급, 색hex, 팀기본값채우기, 저장크기
 } from './state.js';
 import { 접속주소, LAN주소찾기, QR만들기, 터널주소설정, IP감시시작, 감시주소맞추기 } from './network.js';
 import { 게임목록, 게임찾기, 보드정보 } from './games/index.js';
-import { 플레이ID생성, 여러점수기록, 수동점수, 마지막되돌리기, 점수판 } from './scoring.js';
-import { 문제불러오기 } from './content.js';
+import { 플레이ID생성, 여러점수기록, 수동점수, 마지막되돌리기, 점수판, 팀점수제외설정 } from './scoring.js';
+import { 문제불러오기, 연습문제 } from './content.js';
 import {
   시트준비, 시트켜짐, 시트상태, 지금동기화, 점수줄추가,
-  게임결과추가, 참가자추가기록, 팀줄추가, 시트설정
+  게임결과추가, 참가자추가기록, 팀줄추가, 시트설정, 큐비우기
 } from './sheets.js';
+import { 비밀전부지우기 } from './secret.js';
+
+// 개인전 전용 게임(마피아·라이어)의 점수는 팀 점수에 넣지 않는다.
+팀점수제외설정(게임목록.filter(g => g.개인전만).map(g => g.id));
 
 const 루트 = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.PORT) || 3000;
@@ -116,7 +120,9 @@ async function 게임시작(옵션 = {}) {
     playId: c.playId,
     players: state.players,
     teams: state.teams,
-    content: await 문제불러오기(),  // 시작할 때마다 문제를 다시 읽는다 (SPEC 8장)
+    // 시작할 때마다 문제를 다시 읽는다 (SPEC 8장).
+    // 연습 판은 연습 전용 문제만 쓴다 — 진짜 문제가 연습에서 미리 새어 나가면 안 된다.
+    content: 옵션.연습 ? 연습문제 : await 문제불러오기(),
     settings: { ...state.settings, ...옵션 }
   };
 
@@ -240,7 +246,9 @@ function 현재게임뷰(등급, playerId = null) {
     type: g.type,
     phase: c.phase,                 // rules | playing
     연습: !!c.연습,                 // 점수가 안 남는 연습 판인가 (TV·휴대폰·진행자 모두에게 알린다)
-    rules: g.rules
+    rules: g.rules,
+    점수표: g.점수표 || [],         // 무엇을 하면 몇 점인지 — 규칙 카드에 보여준다
+    개인전만: !!g.개인전만
   };
   if (c.phase !== 'playing' || !c.gameState) return 기본;
 
@@ -282,7 +290,8 @@ function 진행자뷰() {
     current: 현재게임뷰('admin'),
     bigScreen: state.settings.bigScreen,
     scoreMode: state.settings.scoreMode,
-    sheet: 시트상태()
+    sheet: 시트상태(),
+    저장: 저장크기()               // data 폴더에 쌓인 양 (진행자가 눈으로 확인)
   };
 }
 
@@ -300,7 +309,14 @@ function 참가자갱신(playerId) {
   const p = state.players[playerId];
   if (!p) return;
   for (const s of io.sockets.sockets.values()) {
-    if (s.data.playerId === playerId) s.emit('view', 참가자뷰(p));
+    if (s.data.playerId !== playerId) continue;
+    // 바뀐 것이 없으면 보내지 않는다. 남이 답을 낼 때마다 모든 휴대폰에 다시 보내면
+    // 트래픽이 인원 제곱으로 늘고, 다시 그려지면서 입력 중이던 한글 조합이 깨진다.
+    const 뷰 = 참가자뷰(p);
+    const 글 = JSON.stringify(뷰);
+    if (s.data.지난뷰 === 글) continue;
+    s.data.지난뷰 = 글;
+    s.emit('view', 뷰);
   }
 }
 
@@ -569,6 +585,31 @@ io.on('connection', (socket) => {
       case '스포일러보기':
         socket.emit('adminSecret', 스포일러뷰());
         break;
+
+      case '초기화': {
+        // 범위 '점수': 점수·게임 기록만 지운다(참가자·팀은 그대로) — 리허설 뒤 본 행사 전에.
+        // 범위 '전체': 참가자·팀까지 지운다 — 새 행사를 처음부터 시작할 때.
+        if (!['점수', '전체'].includes(d.범위)) { r = { ok: false, error: '없는 범위예요.' }; break; }
+        state.current = null;
+        state.scoreLog = [];
+        state.board.games = {};
+        for (const g of 게임목록) state.board.games[g.id] = { playsCount: 0, lastResult: null };
+        비밀전부지우기();
+        큐비우기();
+        if (d.범위 === '전체') {
+          for (const s2 of io.sockets.sockets.values()) {
+            if (s2.data.playerId) { s2.emit('내보내짐'); s2.data.playerId = null; }
+          }
+          state.players = {};
+          팀해산();
+          for (const t of Object.values(state.teams)) { t.name = ''; t.colorId = null; }
+          state.settings.teamPhase = 'none';
+          state.settings.bigScreen = 'auto';
+          state.joinCode = process.env.JOIN_CODE?.trim() || 입장코드생성();
+        }
+        console.log(`[진행자] 초기화 — ${d.범위}`);
+        break;
+      }
 
       case '입장코드재발급':
         state.joinCode = 입장코드생성();

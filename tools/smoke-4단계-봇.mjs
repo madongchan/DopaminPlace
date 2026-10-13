@@ -58,7 +58,12 @@ if (v.players.length !== 11) { console.log('\n  봇이 다 못 들어왔습니�
 // ── 팀 직접 선택 (봇이 스스로 고르는지) ─────────────────────
 console.log('\n[2] 팀 — 봇이 스스로 고르고 이름·색까지 정하는지');
 await 보내(관리, 'admin', { action: '팀나누기_직접' });
-await 잠시(4500);
+// 봇들이 같은 팀을 노리다 거절당하면 다시 고르느라 6초 가까이 걸릴 때가 있다.
+// 정해진 시간만 기다리지 않고, 다 고를 때까지(최대 15초) 기다린다.
+for (let t = 0; t < 30; t++) {
+  await 잠시(500);
+  if (v.teams.reduce((a, x) => a + x.members.length, 0) >= 11) break;
+}
 const 인원 = v.teams.map(t => t.members.length);
 확인('11명이 스스로 팀을 골랐다', 인원.reduce((a, b) => a + b, 0) === 11, 인원.join('/'));
 확인('인원이 균등하다 (4/4/3)', Math.max(...인원) - Math.min(...인원) <= 1, 인원.join('/'));

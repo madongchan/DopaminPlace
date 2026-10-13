@@ -5,17 +5,17 @@ import telepathy from './telepathy/index.js';
 import chosung from './chosung/index.js';
 import nunchi from './nunchi/index.js';
 import reaction from './reaction/index.js';
-import bottlecap from './bottlecap/index.js';
 import mafia from './mafia/index.js';
+import liar from './liar/index.js';
 
 export const 게임목록 = [
   telepathy,
   chosung,
   nunchi,
   reaction,
-  bottlecap,
-  mafia
-  // 7단계: 라이어, 이미지 맞히기
+  mafia,
+  liar
+  // 남은 것: 이미지 맞히기
   // 10단계: 넌센스, 문장 맞추기, 천사혹은악마, 끝나는 말은?, 줄줄이 말해요
 ];
 
@@ -35,6 +35,8 @@ export function 보드정보(g) {
     minPlayers: g.minPlayers,
     maxPlayers: g.maxPlayers,
     color: g.color,
-    rules: g.rules
+    rules: g.rules,
+    점수표: g.점수표 || [],          // [[무엇을 하면, 몇 점], …] — 규칙 카드에 그대로 보여준다
+    개인전만: !!g.개인전만            // true면 이 게임 점수는 팀 점수에 안 들어간다
   };
 }

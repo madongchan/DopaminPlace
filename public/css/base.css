@@ -106,6 +106,21 @@ body::after {
   --줄무늬: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'><defs><pattern id='p' width='48' height='48' patternUnits='userSpaceOnUse'><rect width='48' height='48' fill-opacity='.2'/><path d='M0 0H26L0 26Z M48 0V26L26 48H0Z'/></pattern></defs><rect width='96' height='96' fill='url(%23p)'/><rect x='24' y='24' width='48' height='48'/></svg>");
 }
 
+/* ── 규칙 카드의 점수표 (TV·휴대폰·진행자 공통). 크기는 em 이라 놓인 곳의 글자 크기를 따른다. ── */
+.규칙머리 { color: var(--ppt-gold); margin-right: .5em; white-space: nowrap; }
+.점수표 {
+  background: var(--bg-3); border-radius: var(--r-s); padding: .8em 1em;
+  display: flex; flex-direction: column; gap: .45em;
+}
+.점수표-제목 { font-size: .8em; color: var(--ppt-gold); letter-spacing: .12em; font-weight: 900; }
+.점수표-줄 {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 1em;
+  padding-bottom: .4em; border-bottom: 1px solid var(--line-2);
+}
+.점수표-무엇 { font-weight: 700; line-height: 1.35; }
+.점수표-점 { color: var(--ppt-gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.점수표-덧 { font-size: .78em; color: var(--text-dim); font-weight: 600; }
+
 .neon { color: var(--gold); }
 .dim  { color: var(--text-dim); }
 .mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
