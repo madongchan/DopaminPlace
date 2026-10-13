@@ -20,6 +20,38 @@ for (const [id, 글] of [['brand1', '도파민'], ['brand2', '플레이션']]) {
   }
 }
 
+// ── 배경음악 (큰 화면에서만 — SPEC 9장) ─────────────────────
+// 라이어·마피아는 게임마다 고른 추리 음악, 나머지는 신나는 음악(public/audio/, 모두 CC0 — 출처는 작업일지).
+// 브라우저는 클릭 전에는 소리를 막는다 → 첫 클릭·키 입력 때 튼다. M 키로 끄고 켠다.
+const 음악 = {
+  기본:  new Audio('/audio/bgm-main.mp3'),
+  liar:  new Audio('/audio/bgm-liar.mp3'),
+  mafia: new Audio('/audio/bgm-mafia.mp3')
+};
+// 곡마다 원래 크기가 달라 들리는 크기를 맞춘다 (실측 평균: 기본 -14dB, 라이어 -25dB, 마피아 -12dB)
+const 음량 = { 기본: 0.3, liar: 1, mafia: 0.25 };
+for (const [이름, a] of Object.entries(음악)) { a.loop = true; a.volume = 음량[이름]; }
+let 지금곡 = '기본';
+let 음소거 = false;
+
+function 음악틀기() {
+  for (const [이름, a] of Object.entries(음악)) {
+    if (이름 === 지금곡 && !음소거) a.play().catch(() => {});   // 클릭 전이거나 파일이 없으면 실패 — 다음 클릭 때 다시
+    else a.pause();
+  }
+}
+function 음악고르기(곡) {
+  if (곡 === 지금곡) return;
+  지금곡 = 곡;
+  음악[곡].currentTime = 0;
+  음악틀기();
+}
+addEventListener('pointerdown', 음악틀기);
+addEventListener('keydown', (e) => {
+  if (e.code === 'KeyM') 음소거 = !음소거;   // code 는 한/영 상태와 상관없다
+  음악틀기();
+});
+
 // ── 서버 연결 ───────────────────────────────────────────────
 socket.on('connect', () => {
   $('stat').textContent = '연결됨';
@@ -43,6 +75,7 @@ socket.on('screen', (view) => {
   이전주소 = view.url;
 
   화면고르기(view);
+  음악고르기(Object.hasOwn(음악, view.current?.gameId) ? view.current.gameId : '기본');
 
   const alt = view.대체주소 || [];
   $('alt').hidden = alt.length === 0;
