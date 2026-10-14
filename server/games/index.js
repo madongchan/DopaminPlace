@@ -9,14 +9,15 @@ import mafia from './mafia/index.js';
 import liar from './liar/index.js';
 import coin from './coin/index.js';
 
+// 목록 순서가 TV·진행자 보드의 순서다 — 추천 진행 순서대로 둔다(작업일지 2026-10-15)
 export const 게임목록 = [
-  telepathy,
-  chosung,
-  nunchi,
   reaction,
-  mafia,
+  telepathy,
+  nunchi,
+  chosung,
   liar,
-  coin
+  coin,
+  mafia
   // 남은 것: 이미지 맞히기
   // 10단계: 넌센스, 문장 맞추기, 천사혹은악마, 끝나는 말은?, 줄줄이 말해요
 ];

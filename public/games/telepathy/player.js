@@ -106,7 +106,7 @@ function 기다리기(el, view) {
     for (const [tid, r] of 결과) {
       box.appendChild(요소('div', { class: 'p-공개줄' }, [
         요소('span', { text: `${tid}팀` }),
-        요소('b', { text: `+${r.점수}` })
+        요소('b', { text: `${r.일치} · +${r.점수}` })
       ]));
     }
     el.appendChild(box);

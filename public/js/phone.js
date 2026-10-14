@@ -64,6 +64,7 @@ function 뷰적용(v) {
   }
 
   $('practice').hidden = !v.current?.연습;
+  $('double').hidden = !v.current?.두배;
 
   // 게임이 먼저다 — 규칙 카드 → 진행
   if (v.current) 팀편집중 = false;

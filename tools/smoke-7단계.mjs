@@ -117,13 +117,13 @@ console.log('\n[라이어 게임 — 진행: 설명 → 토론 → 투표]');
 
   liar.onAdmin(s, { action: '답인정' });
   확인('진행자가 라이어 답을 인정하면 라이어 승으로 바뀐다',
-    s.판기록[0].승 === '라이어' && s.판기록[0].점수[라이어id] === 5 && Object.keys(s.판기록[0].점수).length === 1);
+    s.판기록[0].승 === '라이어' && s.판기록[0].점수[라이어id] === 3 && Object.keys(s.판기록[0].점수).length === 1);
 
   liar.onAdmin(s, { action: '다음' });
   확인('마지막 판 뒤에는 끝난다', s.phase === '끝', s.phase);
   const r = liar.result(s);
-  확인('끝나면 라이어에게 +5가 기록된다',
-    r.점수.length === 1 && r.점수[0].playerId === 라이어id && r.점수[0].points === 5);
+  확인('끝나면 라이어에게 +3이 기록된다',
+    r.점수.length === 1 && r.점수[0].playerId === 라이어id && r.점수[0].points === 3);
   확인('보드에 적을 1위가 나온다', r.요약.순위[0].이름 === state.players[라이어id].name);
 }
 
@@ -140,7 +140,7 @@ console.log('\n[라이어 게임 — 라이어가 이기는 경우]');
   liar.onInput(s, 시민들[1], { act: '투표', target: 시민들[0] });
   liar.onTick(s, s.endsAt + 1);                          // 나머지는 안 내고 시간이 끝남
   확인('동률이면 라이어를 못 잡은 것 — 라이어 승', s.phase === '판끝' && s.판기록[0].승 === '라이어' && !s.판기록[0].잡혔나);
-  확인('라이어 승이면 라이어만 +5', s.판기록[0].점수[라이어id] === 5 && Object.keys(s.판기록[0].점수).length === 1);
+  확인('라이어 승이면 라이어만 +3', s.판기록[0].점수[라이어id] === 3 && Object.keys(s.판기록[0].점수).length === 1);
 
   const s2 = 판만들기('테스트-라이어-4'); 쓴판.push(s2.playId);
   const 라2 = 비밀읽기(s2.playId).라이어들[0];
@@ -202,7 +202,7 @@ console.log('\n[끈끈이 동전잡기 — 진행자가 등수만 입력]');
   coin.onAdmin(s, { action: '등수', payload: { teamId: 'A' } });
   coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });
   const 점 = Object.fromEntries(coin.result(s).점수.map(x => [x.playerId, x.points]));
-  확인('1등 팀원 +5 · 2등 +3 · 3등 +1', 점.c === 5 && 점.a === 3 && 점.b === 3 && 점.e === 1,
+  확인('1등 팀원만 +5 · 2·3등은 0', 점.c === 5 && !점.a && !점.b && !점.e,
     `다온 ${점.c} · 가람 ${점.a} · 나래 ${점.b} · 마루 ${점.e}`);
 }
 

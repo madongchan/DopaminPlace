@@ -251,16 +251,18 @@ async function 게임그리기(v) {
   const body = 비우기($('game-body'));
   const btns = 비우기($('game-btns'));
   $('s3').classList.toggle('연습', !!c?.연습);
+  $('s3-plan').hidden = !!c;      // 진행 가이드는 게임을 고를 때만
   if (!c) {
     $('game-title').textContent = '③ 게임 고르기';
     $('s3-guide').textContent = '할 게임을 누르세요. TV와 휴대폰에 규칙 카드가 뜹니다. (흐린 게임은 인원이 모자랍니다)';
     return;
   }
 
-  $('game-title').textContent = `③ ${c.name} — ${c.phase === 'rules' ? '규칙 카드' : (c.연습 ? '연습 중' : '진행 중')}`;
+  $('game-title').textContent = `③ ${c.name} — ${c.phase === 'rules' ? '규칙 카드' : (c.연습 ? '연습 중' : '진행 중')}${c.두배 ? ' · 점수 2배' : ''}`;
 
   if (c.phase === 'rules') {
-    $('s3-guide').textContent = '규칙을 읽어준 뒤 시작을 누르세요. 처음 하는 게임이면 연습으로 한 판 해보세요(점수가 남지 않습니다).';
+    $('s3-guide').textContent = (c.두배 ? '세 번째 팀전이라 자동으로 점수 2배입니다(TV에 표시). ' : '')
+      + '규칙을 읽어준 뒤 시작을 누르세요. 처음 하는 게임이면 연습으로 한 판 해보세요(점수가 남지 않습니다).';
     const ul = 요소('ul', { class: 'a-규칙' });
     for (const r of c.rules || []) ul.appendChild(규칙줄(r));
     body.appendChild(ul);
@@ -304,7 +306,7 @@ async function 게임그리기(v) {
   }
   btns.appendChild(요소('button', {
     class: 'sm', text: '끝내고 점수 주기',
-    onclick: () => { if (confirm('게임을 끝내고 점수를 반영합니다. 계속할까요?')) 보내기('게임끝내기', {}, '점수를 반영했습니다.'); }
+    onclick: () => { if (confirm(`게임을 끝내고 점수를 반영합니다${c.두배 ? ' (점수 2배)' : ''}. 계속할까요?`)) 보내기('게임끝내기', {}, '점수를 반영했습니다.'); }
   }));
   btns.appendChild(요소('button', {
     class: 'sm danger', text: '중단 (점수 없음)',

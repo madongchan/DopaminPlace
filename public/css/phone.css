@@ -303,6 +303,7 @@ button.ghost { background: transparent; color: var(--text-dim); border: 2px soli
   font-size: 15px; font-weight: 900; padding: 7px 16px; border-radius: 999px;
 }
 .연습띠[hidden] { display: none; }
+.두배띠 { background: var(--gold); color: #1a1400; }
 #btn-team-edit { min-height: 0; height: auto; font-size: 16px; padding: 12px 18px; width: auto; }
 #btn-team-edit[hidden] { display: none; }
 

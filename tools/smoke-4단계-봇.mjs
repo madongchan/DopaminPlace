@@ -109,7 +109,8 @@ await 잠시(800);
 확인('보드로 돌아감', v.current === null);
 const 텔 = v.board.find(b => b.id === 'telepathy');
 확인('플레이 횟수 기록', (텔?.playsCount ?? 0) > 0, 텔?.lastResult ?? '');
-확인('11명 모두 점수가 생겼다', v.scoreboard.개인.every(p => p.points > 0),
+// 팀전은 1등 팀만 점수를 받는다(2026-10-15) — 모두가 아니라 1등 팀이 받았는지 본다
+확인('1등 팀 팀원에게 점수가 생겼다', v.scoreboard.개인.some(p => p.points > 0),
   `1위 ${v.scoreboard.개인[0].name} ${v.scoreboard.개인[0].points}점`);
 확인('팀 점수 3개', v.scoreboard.팀.length === 3,
   v.scoreboard.팀.map(t => `${t.name} ${t.points}`).join(' / '));

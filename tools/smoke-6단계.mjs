@@ -398,19 +398,19 @@ console.log('\n[점수]');
   const r = mafia.result(s);
   const 합 = (pid) => r.점수.filter(x => x.playerId === pid).reduce((a, b) => a + b.points, 0);
 
-  확인('이긴 쪽 +4', r.점수.some(x => x.playerId === 경찰 && x.points === 4));
+  확인('이긴 쪽 +3', r.점수.some(x => x.playerId === 경찰 && x.points === 3 && x.reason.includes('승리')));
   확인('진 쪽에는 승리 점수가 없다',
     !r.점수.some(x => x.playerId === 마피아들[0] && x.reason.includes('승리')));
   확인('경찰이 마피아를 찾으면 회당 +1',
     r.점수.some(x => x.playerId === 경찰 && x.points === 2 && x.reason.includes('경찰')));
-  확인('의사가 막으면 회당 +2',
-    r.점수.some(x => x.playerId === 의사 && x.points === 4 && x.reason.includes('의사')));
+  확인('의사가 막으면 회당 +1',
+    r.점수.some(x => x.playerId === 의사 && x.points === 2 && x.reason.includes('의사')));
   확인('끝까지 생존 +1',
     r.점수.some(x => x.playerId === 경찰 && x.points === 1 && x.reason.includes('생존')));
   확인('죽은 사람에게는 생존 점수가 없다',
     !r.점수.some(x => x.playerId === 마피아들[0] && x.reason.includes('생존')));
-  확인('경찰 합계 = 승리4 + 생존1 + 경찰적중2 = 7', 합(경찰) === 7, `${합(경찰)}점`);
-  확인('의사 합계 = 승리4 + 생존1 + 방어4 = 9', 합(의사) === 9, `${합(의사)}점`);
+  확인('경찰 합계 = 승리3 + 생존1 + 경찰적중2 = 6', 합(경찰) === 6, `${합(경찰)}점`);
+  확인('의사 합계 = 승리3 + 생존1 + 방어2 = 6', 합(의사) === 6, `${합(의사)}점`);
   확인('요약에 마피아 명단이 들어간다 (끝난 뒤라 시트에 적어도 된다)',
     r.요약.마피아.length === 마피아들.length, r.요약.마피아.join(', '));
 

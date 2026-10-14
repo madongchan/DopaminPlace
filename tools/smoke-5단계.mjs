@@ -7,10 +7,12 @@
 // data/state.json 은 건드리지 않는다. 메모리의 참가자만 가짜로 바꿔 쓰고 되돌린다.
 //
 // 보는 것:
+//   텔레파시     — 라운드마다 일치율 1등 팀만 +1, 게임 1등 팀만 +5, 개인 활약 없음
 //   초성 퀴즈    — 정답 유출 방지, 힌트 상시 표시, 오답 2초 잠금, 첫 정답 팀만 1점, 정답 인정
 //   눈치 게임    — 0.3초 동시 탈락, 미입력 탈락, 생존 +2
 //   반응속도     — 초록 시각 비공개, 부정출발 1000ms, 좋은 3판 평균
 import { state } from '../server/state.js';
+import telepathy from '../server/games/telepathy/index.js';
 import chosung from '../server/games/chosung/index.js';
 import nunchi from '../server/games/nunchi/index.js';
 import reaction from '../server/games/reaction/index.js';
@@ -31,6 +33,38 @@ function 참가자세팅(목록) {
 }
 const 이름들 = (점수맵) =>
   Object.entries(점수맵).map(([k, v]) => `${state.players[k]?.name}=${v}`).join(' ');
+
+// ══════════════════════════════════════════════════════════
+console.log('\n[텔레파시 — 라운드 1등 팀만 +1, 게임 1등 팀만 +5]');
+{
+  참가자세팅([
+    ['a', '가', 'A'], ['b', '나', 'A'], ['c', '다', 'A'],
+    ['d', '라', 'B'], ['e', '마', 'B'], ['f', '바', 'B'],
+    ['g', '사', 'C'], ['h', '아', 'C'], ['i', '자', 'C']
+  ]);
+  const s = telepathy.create({ content: { telepathy: ['라면 재료', '여름 하면'] } });
+  const 낸다 = (답들) => { for (const [pid, 답] of Object.entries(답들)) telepathy.onInput(s, pid, { answer: 답 }); };
+
+  // 1라운드: A 3/3, B 2/3, C 모두 다름 → A만 +1
+  낸다({ a: '계란', b: '계란', c: '계란', d: '파', e: '파', f: '김치', g: '치즈', h: '떡', i: '만두' });
+  telepathy.onTick(s, s.endsAt);
+  const 결 = s.라운드기록[0].결과;
+  확인('일치율이 가장 높은 팀만 +1', 결.A.점수 === 1 && 결.B.점수 === 0 && 결.C.점수 === 0,
+    `A ${결.A.일치}=${결.A.점수} · B ${결.B.일치}=${결.B.점수} · C ${결.C.일치}=${결.C.점수}`);
+
+  // 2라운드: A·B 둘 다 2/3 → 동점이면 둘 다 +1, C는 혼자 쓴 답뿐이라 0
+  telepathy.onAdmin(s, { action: '다음' });
+  낸다({ a: '수박', b: '수박', c: '바다', d: '수박', e: '수박', f: '모기', g: '바다', h: '모기', i: '휴가' });
+  telepathy.onTick(s, s.endsAt);
+  확인('동점이면 공동으로 +1', s.팀총점.A === 2 && s.팀총점.B === 1 && s.팀총점.C === 0,
+    `A ${s.팀총점.A} · B ${s.팀총점.B} · C ${s.팀총점.C}`);
+
+  const r = telepathy.result(s);
+  const 받은 = Object.fromEntries(r.점수.map(x => [x.playerId, x.points]));
+  확인('게임 1등 팀만 팀원 모두 +5', 받은.a === 5 && 받은.b === 5 && 받은.c === 5 && !받은.d && !받은.g,
+    JSON.stringify(받은));
+  확인('개인 활약 점수는 없다', !r.점수.some(x => x.reason.includes('활약')));
+}
 
 // ══════════════════════════════════════════════════════════
 console.log('\n[초성 퀴즈]');
@@ -108,14 +142,12 @@ console.log('\n[초성 퀴즈]');
     참가자세팅([['a', '가', 'A'], ['c', '다', 'B'], ['e', '마', 'C']]);
     const s3 = chosung.create({ content: { chosung: 문제 } });
     s3.팀총점 = { A: 9, B: 5, C: 1 };
-    s3.개인첫정답 = { a: 5, c: 1 };                       // a는 5번 맞혔지만 상한은 +3
+    s3.개인첫정답 = { a: 5, c: 1 };
     const r = chosung.result(s3);
     const 점 = (pid) => r.점수.filter(x => x.playerId === pid).map(x => x.points);
-    확인('1등 팀원 +5', 점('a').includes(5), `a = ${점('a').join(', ')}`);
-    확인('2등 팀원 +3', 점('c').includes(3), `c = ${점('c').join(', ')}`);
-    확인('3등 팀원 +1', 점('e').includes(1), `e = ${점('e').join(', ')}`);
-    const 활약 = r.점수.find(x => x.playerId === 'a' && x.reason.includes('활약'));
-    확인('개인 활약은 최대 +3', 활약?.points === 3, `5번 맞혔지만 +${활약?.points}`);
+    확인('1등 팀원만 +5', 점('a').join() === '5', `a = ${점('a').join(', ')}`);
+    확인('2·3등 팀은 0점', 점('c').join() === '0' && 점('e').join() === '0', `c = ${점('c')} · e = ${점('e')}`);
+    확인('개인 활약 점수는 없다', !r.점수.some(x => x.reason.includes('활약')));
   }
 }
 

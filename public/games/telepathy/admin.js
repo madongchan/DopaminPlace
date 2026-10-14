@@ -59,7 +59,7 @@ function 공개중(el, view, 팀, 조작) {
     const 칸 = 요소('div', { class: 'a-tp팀', style: { borderColor: 색 } }, [
       요소('div', { class: 'a-tp머리' }, [
         요소('span', { text: t.name || `${tid}팀`, style: { color: 색 } }),
-        요소('b', { text: `+${r.점수}`, style: { color: 색 } })
+        요소('b', { text: `${r.일치} · +${r.점수}`, style: { color: 색 } })
       ])
     ]);
 

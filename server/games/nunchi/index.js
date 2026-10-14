@@ -35,10 +35,10 @@ export default {
     '3판을 합쳐 순위를 정합니다.'
   ],
 
-  create() {
+  create(ctx) {
     return {
       판: 0,
-      총판: 총판수,
+      총판: ctx?.settings?.연습 ? 1 : 총판수,     // 연습 판은 예시 한 판만
       phase: '대기',        // 대기 → 진행 → 판끝 → 끝
       시작시각: null,
       endsAt: null,

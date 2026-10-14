@@ -633,6 +633,7 @@ body { overflow: hidden; height: 100vh; }
   font-size: 30px; font-weight: 900; padding: 14px 36px; border-radius: 999px;
   box-shadow: 0 10px 34px rgba(0,0,0,.5); z-index: 80;
 }
+.두배띠 { background: var(--gold); color: #1a1400; }
 
 /* ══════════════════════════════════════════════════════════
    우주 바탕 통일 — 첫 화면의 분위기를 모든 화면에 잇는다

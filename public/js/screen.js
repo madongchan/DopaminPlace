@@ -204,6 +204,7 @@ let 지금게임id = null;
 async function 화면고르기(view) {
   const c = view.current;
   $('practice').hidden = !(c?.연습 && view.bigScreen !== 'scoreboard');
+  $('double').hidden = !(c?.두배 && view.bigScreen !== 'scoreboard');
 
   if (view.bigScreen === 'scoreboard') {
     점수판그리기(view);

@@ -49,7 +49,7 @@ function 공개화면(el, view, 팀) {
     const 카드 = 요소('div', { class: 'tp-팀카드', style: { borderColor: 색 } }, [
       요소('div', { class: 'tp-팀머리' }, [
         요소('span', { class: 'tp-팀이름', text: t.name || `${tid}팀`, style: { color: 색 } }),
-        요소('span', { class: 'tp-팀점수', text: `+${r.점수}`, style: { color: 색 } })
+        요소('span', { class: 'tp-팀점수', text: `${r.일치} · +${r.점수}`, style: { color: 색 } })
       ])
     ]);
 

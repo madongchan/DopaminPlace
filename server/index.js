@@ -98,7 +98,7 @@ function 게임고르기(gameId) {
   const g = 게임찾기(gameId);
   if (!g) return { ok: false, error: '없는 게임이에요.' };
   if (state.current) return { ok: false, error: '이미 진행 중인 게임이 있어요.' };
-  state.current = { gameId, playId: null, phase: 'rules', gameState: null };
+  state.current = { gameId, playId: null, phase: 'rules', gameState: null, 두배: 자동2배(g) };
   // TV에 팀 소개를 띄워 둔 채였다면 규칙 카드가 끝난 뒤 보드로 돌아오게 한다.
   if (state.settings.bigScreen === 'teams') state.settings.bigScreen = 'auto';
   저장();
@@ -130,6 +130,7 @@ async function 게임시작(옵션 = {}) {
   c.phase = 'playing';
   // 연습 판: 게임 모듈은 모른다. 끝낼 때 점수·횟수를 남기지 않는 것으로만 구분한다.
   c.연습 = !!옵션.연습;
+  if (c.연습) c.두배 = false;    // 연습 판은 점수가 없으니 2배도 없다
   저장();
   console.log(`[게임] ${g.name} ${c.연습 ? '연습 ' : ''}시작 (playId ${c.playId})`);
   return { ok: true };
@@ -143,6 +144,17 @@ function 게임취소() {
   return { ok: true };
 }
 
+// 자동 「점수 2배」 — 세 번째로 하는 팀전부터 점수를 2배로 준다(2026-10-15 담당자 결정).
+// 팀전이 1등 팀만 +5라 같은 팀이 앞의 두 판을 이기면 마지막 팀전 전에 1등이 확정된다(시뮬레이션 33%).
+// 2배(+10)면 10%로 줄어든다. 진행자가 켜는 게 아니라 끝낸 팀전 판 수로 정해서 순서를 바꿔도 그대로 맞다.
+function 자동2배(g) {
+  if (g.type === 'solo') return false;
+  const 끝낸팀전 = 게임목록
+    .filter(x => x.type !== 'solo')
+    .reduce((합, x) => 합 + (state.board.games[x.id]?.playsCount || 0), 0);
+  return 끝낸팀전 >= 2;
+}
+
 // 게임을 끝내고 점수를 반영한다.
 function 게임끝내기({ 점수반영 = true } = {}) {
   const c = state.current;
@@ -153,7 +165,10 @@ function 게임끝내기({ 점수반영 = true } = {}) {
   let 요약 = null;
   if (점수반영 && g && c.gameState) {
     const r = g.result(c.gameState) || {};
-    const 줄들 = 여러점수기록(c.playId, c.gameId, r.점수 || []);
+    const 점수 = (r.점수 || []).map(x => c.두배
+      ? { ...x, points: x.points * 2, reason: `${x.reason} (점수 2배)` }
+      : x);
+    const 줄들 = 여러점수기록(c.playId, c.gameId, 점수);
     요약 = r.요약 || null;
 
     // 시트에도 남긴다(큐에 쌓였다가 5초마다 한 번에 간다)
@@ -246,6 +261,7 @@ function 현재게임뷰(등급, playerId = null) {
     type: g.type,
     phase: c.phase,                 // rules | playing
     연습: !!c.연습,                 // 점수가 안 남는 연습 판인가 (TV·휴대폰·진행자 모두에게 알린다)
+    두배: !!c.두배,                 // 진행자가 켠 「점수 2배」 판인가
     rules: g.rules,
     점수표: g.점수표 || [],         // 무엇을 하면 몇 점인지 — 규칙 카드에 보여준다
     개인전만: !!g.개인전만
