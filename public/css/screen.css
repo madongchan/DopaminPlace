@@ -626,6 +626,17 @@ body { overflow: hidden; height: 100vh; }
 .mf-역할이름 { font-size: 24px; }
 .mf-역할글 { font-size: 22px; color: var(--text-dim); }
 .mf-역할칸.마피아 .mf-역할글 { color: var(--coral); }
+/* 끝난 뒤 날짜별 진행기록 */
+.mf-진행기록 {
+  /* 최대 6일 — 한 줄에 3칸씩 두 줄이면 1080p 화면 안에 다 들어간다 */
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  margin-top: 12px; min-height: 0; overflow: hidden;
+}
+.mf-날 { background: var(--bg-2); border: 2px solid var(--line); border-radius: 12px; padding: 8px 14px; }
+.mf-날제목 { font-size: 18px; font-weight: 900; color: var(--ppt-gold); margin-bottom: 2px; }
+.mf-날줄 { font-size: 15px; line-height: 1.4; color: var(--text); }
+.mf-날줄.몰래 { color: var(--coral); }
+.mf-날줄.몰래::before { content: '🌙 '; }
 
 /* ── 연습 판 표시 — 위쪽 가운데에 늘 떠 있다 ── */
 .연습띠 {

@@ -185,6 +185,19 @@ console.log('\n[밤]');
   확인('조사 결과는 남의 화면에 없다',
     mafia.views(s).player(시민들[0]).내조사 === undefined);
 
+  // 날짜별 진행기록 — 밤의 비밀(누가 노렸고 누가 지켰나)은 끝나기 전엔 어디에도 안 나간다 (2026-10-15)
+  const 진행중뷰 = mafia.views(s);
+  확인('게임 중에는 진행기록이 어느 화면에도 없다',
+    진행중뷰.screen.진행기록 === null && 진행중뷰.admin.진행기록 === null && 진행중뷰.player(시민들[0]).진행기록 === null);
+  확인('밤의 비밀은 state 에 없고 secret.json 에만 있다',
+    !('밤뒤' in s) && !JSON.stringify(s).includes('노렸') && (비밀읽기(playId)?.밤뒤 || []).length === 1);
+  const 끝판 = { ...s, 결과: '시민승' };
+  const 날들 = mafia.views(끝판).screen.진행기록 || [];
+  const 첫날 = (날들[0]?.줄들 || []).map(x => (x.몰래 ? '🌙' : '') + x.글);
+  확인('끝나면 날짜별 진행기록에 밤의 비밀이 공개된다',
+    날들[0]?.day === 1 && 첫날.some(x => x.startsWith('🌙') && x.includes('의사가 지켜 살았습니다'))
+    && 첫날.some(x => x.includes('조사') && x.includes('마피아!')), 첫날.join(' / '));
+
   // 의사 연속 보호 금지
   s.phase = '밤';
   mafia.onInput(s, 의사, { act: '지목', target: 시민들[0] });

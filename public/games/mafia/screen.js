@@ -173,6 +173,19 @@ function 끝화면(el, view, 팀) {
     ]));
   }
   el.appendChild(표);
-  el.appendChild(기록칸(view));
+  el.appendChild(진행기록칸(view.진행기록));
   void 팀;
+}
+
+// ── 날짜별 진행기록 (끝난 뒤에만 서버가 보낸다) ──────────────
+// 몰래 = 게임 중에는 아무도 몰랐던 밤의 일(마피아가 노린 사람, 의사·경찰의 행동). 색을 달리해 보여준다.
+function 진행기록칸(날들 = []) {
+  const wrap = 요소('div', { class: 'mf-진행기록' });
+  for (const d of 날들 || []) {
+    wrap.appendChild(요소('div', { class: 'mf-날' }, [
+      요소('div', { class: 'mf-날제목', text: `${d.day}일차` }),
+      ...d.줄들.map(x => 요소('div', { class: 'mf-날줄' + (x.몰래 ? ' 몰래' : ''), text: x.글 }))
+    ]));
+  }
+  return wrap;
 }

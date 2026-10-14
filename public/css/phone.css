@@ -315,3 +315,8 @@ button { text-shadow: none; }
   border-style: solid; border-width: 6px; border-color: var(--ppt-gold);
   -webkit-mask-box-image: var(--줄무늬) 24 fill / 6px / 0 round;
 }
+
+/* 마피아 끝난 뒤 날짜별 진행기록 */
+.mf-p날 { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; font-size: 14px; line-height: 1.5; }
+.mf-p날 > b { color: var(--ppt-gold); }
+.mf-p날줄.몰래 { color: var(--coral); }

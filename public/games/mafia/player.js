@@ -211,4 +211,11 @@ function 끝(el, view) {
     ]));
   }
   el.appendChild(표);
+  // 날짜별 진행기록 — 🌙 줄은 게임 중에는 아무도 몰랐던 밤의 일
+  for (const d of view.진행기록 || []) {
+    el.appendChild(요소('div', { class: 'mf-p날' }, [
+      요소('b', { text: `${d.day}일차` }),
+      ...d.줄들.map(x => 요소('div', { class: 'mf-p날줄' + (x.몰래 ? ' 몰래' : ''), text: (x.몰래 ? '🌙 ' : '') + x.글 }))
+    ]));
+  }
 }
