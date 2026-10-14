@@ -144,6 +144,8 @@ body::after {
   font-size: .8em; font-weight: 900;
 }
 .점수표 > .배점 { font-size: 1.05em; margin: .2em 0 .3em; }
+/* 2배 판에서 두 배가 된 점수 — 더 밝게 빛나 바뀐 것이 보이게 */
+.두배됨 { color: #FFE27A; text-shadow: 0 0 .5em rgba(255, 214, 64, .75); }
 
 .neon { color: var(--gold); }
 .dim  { color: var(--text-dim); }

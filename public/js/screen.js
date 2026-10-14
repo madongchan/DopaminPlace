@@ -270,6 +270,7 @@ function 규칙카드그리기(c) {
   const ul = 요소('ul', { class: 'rc-규칙' });
   for (const r of c.rules || []) ul.appendChild(규칙줄(r));
   const 점수표 = 점수표상자(c);
+  box.classList.toggle('점수많음', (c.점수표 || []).length > 5);   // 줄이 많으면 TV에서 글자를 줄여 카드가 화면 밖으로 안 넘치게
   box.classList.toggle('한칸', !점수표);
   box.appendChild(요소('div', { class: 'rc-왼' }, [
     요소('div', { class: 'rc-종류', text: 종류글[c.type] || c.type }),

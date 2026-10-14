@@ -676,6 +676,7 @@ body { overflow: hidden; height: 100vh; }
 .rc-왼 { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .rc-오 { align-self: center; }
 .rc-오 .점수표 { font-size: 28px; }
+.점수많음 .rc-오 .점수표 { font-size: 23px; }
 .rc-이름 { font-size: 72px; }
 .rc-규칙 { gap: 12px; }
 .rc-대기 { grid-column: 1 / -1; margin-top: 0; }

@@ -28,11 +28,11 @@ export function 그리기(el, current, 조작) {
   // 지금까지 기록
   const 순위 = view.순위 || [];
   if (순위.length) {
-    const box = 요소('div', { class: 'a-rt순위' }, [요소('span', { class: 'a-라벨', text: '기록' })]);
+    const box = 요소('div', { class: 'a-rt순위' }, [요소('span', { class: 'a-라벨', text: '점수 (판마다 1·2·3등 +3/+2/+1)' })]);
     for (const x of 순위) {
       box.appendChild(요소('div', { class: 'a-rt줄' }, [
         요소('span', { text: `${x.rank}위 ${x.name}` }),
-        요소('b', { text: `${x.기록}ms` })
+        요소('b', { text: `${x.총점}점` })
       ]));
     }
     el.appendChild(box);

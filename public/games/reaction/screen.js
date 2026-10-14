@@ -42,22 +42,27 @@ function 쉬는중(el, view) {
     return;
   }
 
-  // 반응속도는 작을수록 좋다 — 순위막대(큰 값이 길어짐)를 쓰지 않고 직접 그린다
-  const 가장빠름 = Math.min(...순위.map(x => x.기록));
+  // 줄 = 등수 · 이름 · 합계 막대 · 이번 판(기록과 받은 점수) · 합계 점수
+  const 최고점 = Math.max(1, ...순위.map(x => x.총점));
   const wrap = 요소('div', { class: 'rt-기록판' });
   for (const x of 순위) {
-    const 비율 = Math.max(0.08, 가장빠름 / x.기록);      // 빠를수록 길게
     wrap.appendChild(요소('div', { class: 'rt-줄' + (x.rank === 1 ? ' 으뜸' : '') }, [
       요소('span', { class: 'rt-등수', text: `${x.rank}위` }),
       요소('span', { class: 'rt-이름', text: x.name }),
       요소('span', { class: 'rt-바' }, [
-        요소('i', { style: { width: `${(비율 * 100).toFixed(1)}%` } })
+        요소('i', { style: { width: `${(Math.max(0.04, x.총점 / 최고점) * 100).toFixed(1)}%` } })
       ]),
-      // 이번 판 기록을 따로 보여준다 — 평균만 보이면 방금 1초를 받은 것이 가려진다
-      요소('span', { class: 'rt-이번' + (x.이번판 >= 1000 ? ' 나쁨' : ''), text: x.이번판 != null ? `이번 ${x.이번판}ms` : '' }),
-      요소('span', { class: 'rt-ms', text: `평균 ${x.기록}ms` })
+      요소('span', { class: 'rt-이번' + (x.이번판?.점 ? '' : ' 나쁨'), text: 이번판글(x.이번판) }),
+      요소('span', { class: 'rt-ms', text: `${x.총점}점` })
     ]));
   }
   el.appendChild(wrap);
-  el.appendChild(요소('div', { class: 'tp-안내작게', text: '순위는 5판 중 잘한 3판의 평균으로 정합니다 · 초록 전에 누르거나 안 누르면 그 판은 1000ms' }));
+  el.appendChild(요소('div', { class: 'tp-안내작게', text: '판마다 가장 빠른 1·2·3등 +3 / +2 / +1 · 초록 전에 누르거나 안 누르면 그 판 탈락' }));
+}
+
+// 이번 판 한 칸 — '231ms +3' / '탈락'
+function 이번판글(판) {
+  if (!판) return '';
+  if (판.ms == null) return '탈락';
+  return `${판.ms}ms +${판.점}`;
 }

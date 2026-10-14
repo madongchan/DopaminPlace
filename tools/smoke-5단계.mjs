@@ -9,8 +9,8 @@
 // 보는 것:
 //   텔레파시     — 라운드마다 일치율 1등 팀만 +1, 게임 1등 팀만 +5, 개인 활약 없음
 //   초성 퀴즈    — 정답 유출 방지, 힌트 상시 표시, 오답 2초 잠금, 첫 정답 팀만 1점, 정답 인정
-//   눈치 게임    — 0.3초 동시 탈락, 미입력 탈락, 생존 +2
-//   반응속도     — 초록 시각 비공개, 부정출발 1000ms, 좋은 3판 평균
+//   눈치 게임    — 0.3초 동시 탈락, 미입력 탈락, 판마다 생존 +1
+//   반응속도     — 초록 시각 비공개, 판마다 1·2·3등 +3/+2/+1, 초록 전·안 누름은 그 판 탈락
 import { state } from '../server/state.js';
 import telepathy from '../server/games/telepathy/index.js';
 import chosung from '../server/games/chosung/index.js';
@@ -35,7 +35,7 @@ const 이름들 = (점수맵) =>
   Object.entries(점수맵).map(([k, v]) => `${state.players[k]?.name}=${v}`).join(' ');
 
 // ══════════════════════════════════════════════════════════
-console.log('\n[텔레파시 — 라운드 1등 팀만 +1, 게임 1등 팀만 +5]');
+console.log('\n[텔레파시 — 라운드마다 같은 답 최다 팀 팀원 모두 +1]');
 {
   참가자세팅([
     ['a', '가', 'A'], ['b', '나', 'A'], ['c', '다', 'A'],
@@ -61,8 +61,8 @@ console.log('\n[텔레파시 — 라운드 1등 팀만 +1, 게임 1등 팀만 +5
 
   const r = telepathy.result(s);
   const 받은 = Object.fromEntries(r.점수.map(x => [x.playerId, x.points]));
-  확인('게임 1등 팀만 팀원 모두 +5', 받은.a === 5 && 받은.b === 5 && 받은.c === 5 && !받은.d && !받은.g,
-    JSON.stringify(받은));
+  확인('이긴 라운드 수만큼 팀원 모두 점수 (A 2 · B 1 · C 0, 끝날 때 보너스 없음)',
+    받은.a === 2 && 받은.b === 2 && 받은.c === 2 && 받은.d === 1 && 받은.g === 0, JSON.stringify(받은));
   확인('개인 활약 점수는 없다', !r.점수.some(x => x.reason.includes('활약')));
 }
 
@@ -109,8 +109,8 @@ console.log('\n[초성 퀴즈]');
   // ── 가장 먼저 맞힌 팀만 점수를 얻는다 ──
   s.다음입력 = {};                                      // 2초 지난 것으로 만든다
   chosung.onInput(s, 'c', { answer: [...정답].join(' ') });   // B팀 — 띄어쓰기를 넣어 제출
-  확인('공백을 지우고 비교한다 (띄어 써도 정답)', s.팀총점.B === 1, `B=${s.팀총점.B}`);
-  확인('가장 먼저 맞힌 팀이 1점', s.팀총점.B === 1 && !s.팀총점.A && !s.팀총점.C);
+  확인('공백을 지우고 비교한다 (띄어 써도 정답)', s.팀총점.B === 0.5, `B=${s.팀총점.B}`);
+  확인('가장 먼저 맞힌 팀이 +0.5', s.팀총점.B === 0.5 && !s.팀총점.A && !s.팀총점.C);
   확인('한 팀이 맞히면 그 문제는 바로 공개된다', s.phase === 'reveal', s.phase);
 
   chosung.onInput(s, 'a', { answer: 정답 });             // 공개된 뒤에 다른 팀이 낸 정답
@@ -119,7 +119,7 @@ console.log('\n[초성 퀴즈]');
   v = chosung.views(s);
   확인('공개 뒤에는 정답이 화면에 나온다', v.screen.정답 === 정답, v.screen.정답);
   확인('맞힌 팀이 점수와 함께 나온다',
-    v.screen.맞힌.map(x => `${x.teamId}:${x.점수}`).join(' ') === 'B:1',
+    v.screen.맞힌.map(x => `${x.teamId}:${x.점수}`).join(' ') === 'B:0.5',
     v.screen.맞힌.map(x => `${x.teamId}:${x.점수}`).join(' '));
   확인('이미 맞힌 팀이 있으면 다른 오답은 인정할 수 없다', v.admin.오답.every(o => o.인정가능 === false));
 
@@ -132,7 +132,7 @@ console.log('\n[초성 퀴즈]');
     const 줄 = chosung.views(s2).admin.오답[0];
     확인('진행자 로그에 인정 가능 표시가 있다', 줄?.인정가능 === true);
     chosung.onAdmin(s2, { action: '정답인정', payload: { 번호: 줄.번호 } });
-    확인('정답 인정으로 팀 점수가 들어간다', s2.팀총점.A === 1, `A=${s2.팀총점.A}`);
+    확인('정답 인정으로 팀 점수가 들어간다', s2.팀총점.A === 0.5, `A=${s2.팀총점.A}`);
     확인('인정하면 그 문제는 바로 공개된다', s2.phase === 'reveal', s2.phase);
     확인('인정한 것은 표시가 남는다', chosung.views(s2).screen.맞힌[0]?.인정 === true);
   }
@@ -141,12 +141,12 @@ console.log('\n[초성 퀴즈]');
   {
     참가자세팅([['a', '가', 'A'], ['c', '다', 'B'], ['e', '마', 'C']]);
     const s3 = chosung.create({ content: { chosung: 문제 } });
-    s3.팀총점 = { A: 9, B: 5, C: 1 };
-    s3.개인첫정답 = { a: 5, c: 1 };
+    s3.팀총점 = { A: 4.5, B: 2.5, C: 0 };                 // 9문제 · 5문제 · 0문제 맞힘
     const r = chosung.result(s3);
     const 점 = (pid) => r.점수.filter(x => x.playerId === pid).map(x => x.points);
-    확인('1등 팀원만 +5', 점('a').join() === '5', `a = ${점('a').join(', ')}`);
-    확인('2·3등 팀은 0점', 점('c').join() === '0' && 점('e').join() === '0', `c = ${점('c')} · e = ${점('e')}`);
+    확인('맞힌 문제 × 0.5 를 팀원 모두 그대로 (끝날 때 보너스 없음)',
+      점('a').join() === '4.5' && 점('c').join() === '2.5' && 점('e').join() === '0',
+      `a ${점('a')} · c ${점('c')} · e ${점('e')}`);
     확인('개인 활약 점수는 없다', !r.점수.some(x => x.reason.includes('활약')));
   }
 }
@@ -177,7 +177,10 @@ console.log('\n[눈치 게임]');
 
   nunchi.onAdmin(s, { action: '지금끝' });
   확인('끝까지 안 누른 사람도 탈락', s.탈락.includes('e'), `탈락 ${s.탈락.length}명`);
-  확인('생존자에게만 +2', s.점수.a === 2 && s.점수.b === 2 && !s.점수.e, 이름들(s.점수));
+  확인('판마다 생존자에게만 +1', s.점수.a === 1 && s.점수.b === 1 && !s.점수.e, 이름들(s.점수));
+  const 점 = Object.fromEntries(nunchi.result(s).점수.map(x => [x.playerId, x.points]));
+  확인('끝나면 판 점수 합계 그대로 (참가 +1·등수 점수 없음, 0점도 기록)',
+    점.a === 1 && 점.b === 1 && 점.e === 0, JSON.stringify(점));
 }
 
 // ══════════════════════════════════════════════════════════
@@ -192,29 +195,34 @@ console.log('\n[반응속도]');
     v.screen.바뀔시각 === undefined && v.player('a').바뀔시각 === undefined);
   확인('진행자만 스포일러로 볼 수 있다', typeof v.adminSecret.바뀔시각 === 'number');
 
-  reaction.onInput(s, 'a', { ms: 200 });                 // 아직 빨강 — 부정출발
-  확인('빨강일 때 누르면 부정출발 1000ms', s.이번라운드.a === 1000, `${s.이번라운드.a}ms`);
-
+  // 판마다 1·2·3등 +3 / +2 / +1, 초록 전에 누르거나 안 누르면 그 판 탈락 (2026-10-15)
+  참가자세팅([['a', '가', 'A'], ['b', '나', 'A'], ['c', '다', 'B'], ['d', '라', 'B']]);
+  reaction.onInput(s, 'a', { ms: 200 });                 // 아직 빨강 — 초록 전에 누름
   reaction.onTick(s, s.바뀔시각 + 1);                    // 초록으로 바꾼다
   확인('시간이 되면 초록으로 바뀐다', s.phase === '초록', s.phase);
-
+  reaction.onInput(s, 'a', { ms: 150 });                 // 이미 탈락한 판에 다시 눌러도 안 된다
   reaction.onInput(s, 'b', { ms: 250 });
   reaction.onInput(s, 'c', { ms: 400 });
-  확인('마지막 사람이 내면 라운드가 바로 끝난다', s.phase === '라운드끝', s.phase);
+  reaction.onTick(s, s.초록시각 + 7000);                 // 라는 안 누름 — 시간이 지나 판이 끝난다
+  확인('판이 끝난다', s.phase === '라운드끝', s.phase);
 
-  const 순위 = reaction.views(s).screen.순위
-    .map(x => `${x.rank}위 ${x.name} ${x.기록}ms`).join(' / ');
-  확인('순위가 나온다', 순위 === '1위 나 250ms / 2위 다 400ms / 3위 가 1000ms', 순위);
-  const 가 = reaction.views(s).screen.순위.find(x => x.name === '가');
-  확인('부정출발한 판은 이번 판 기록에 1000ms 로 나간다', 가?.이번판 === 1000, `${가?.이번판}ms`);
+  const 첫판 = Object.fromEntries(Object.entries(s.기록).map(([k, x]) => [k, x[0]]));
+  확인('판마다 빠른 순 1·2등 +3 / +2', 첫판.b.점 === 3 && 첫판.c.점 === 2, `나 ${첫판.b.점} · 다 ${첫판.c.점}`);
+  확인('초록 전에 누르면 그 판 탈락(점수 없음)', 첫판.a.ms === null && 첫판.a.점 === 0);
+  확인('안 누르면 그 판 탈락(점수 없음)', 첫판.d.ms === null && 첫판.d.점 === 0);
 
-  // 좋은 3판 평균 (5판 중)
-  const s2 = reaction.create();
-  s2.기록 = { a: [500, 300, 200, 400, 1000] };           // 좋은 3개 = 200, 300, 400
-  확인('기록은 좋은 3판의 평균이다',
-    reaction.views(s2).screen.순위[0]?.기록 === 300,
-    `${reaction.views(s2).screen.순위[0]?.기록}ms (200·300·400 평균)`);
-  확인('가장 빠른 사람이 +5', reaction.result(s2).점수[0]?.points === 5);
+  // 둘째 판 — 점수가 쌓인다
+  reaction.onAdmin(s, { action: '다음' });
+  reaction.onTick(s, s.바뀔시각 + 1);
+  for (const [id, ms] of [['a', 180], ['b', 300], ['c', 300], ['d', 500]]) reaction.onInput(s, id, { ms });
+  확인('다 누르면 판이 바로 끝난다', s.phase === '라운드끝', s.phase);
+  확인('같은 ms면 같은 등수 (나·다 공동 2등 +2, 라는 4등 0)',
+    s.기록.b[1].점 === 2 && s.기록.c[1].점 === 2 && s.기록.d[1].점 === 0);
+
+  const 순위 = reaction.views(s).screen.순위.map(x => `${x.rank}위 ${x.name} ${x.총점}`).join(' / ');
+  확인('순위는 합계 점수 순', 순위 === '1위 나 5 / 2위 다 4 / 3위 가 3 / 4위 라 0', 순위);
+  const 점 = Object.fromEntries(reaction.result(s).점수.map(x => [x.playerId, x.points]));
+  확인('끝나면 합계 그대로 점수 (0점도 기록)', 점.b === 5 && 점.c === 4 && 점.a === 3 && 점.d === 0, JSON.stringify(점));
 }
 
 // ══════════════════════════════════════════════════════════

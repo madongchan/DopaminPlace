@@ -275,8 +275,8 @@ async function 게임그리기(v) {
     }));
     btns.appendChild(두배버튼(c));
     btns.appendChild(요소('button', {
-      class: 'ghost', text: '취소',
-      onclick: () => { if (confirm('이 게임을 취소하고 보드로 돌아갑니다. 계속할까요?')) 보내기('게임취소', {}, '보드로 돌아갔습니다.'); }
+      class: 'ghost', text: '이 게임 안 하기 (게임 목록으로)',
+      onclick: () => { if (confirm('이 게임을 시작하지 않고 게임 목록으로 돌아갑니다. 계속할까요?')) 보내기('게임취소', {}, '게임 목록으로 돌아갔습니다.'); }
     }));
     return;
   }

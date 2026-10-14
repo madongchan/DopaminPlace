@@ -36,7 +36,7 @@ function 신호판(el, view, 보내기) {
   }, [
     요소('span', {
       class: 'rt-판글',
-      text: 이미냈다 ? `${view.내이번판}ms` : 초록 ? '눌러!' : '기다려'
+      text: 이미냈다 ? (view.내이번판 === '반칙' ? '탈락!' : `${view.내이번판}ms`) : 초록 ? '눌러!' : '기다려'
     })
   ]);
 
@@ -62,7 +62,7 @@ function 신호판(el, view, 보내기) {
   el.appendChild(요소('p', {
     class: 'sub',
     text: 이미냈다 ? '다음 라운드를 기다려주세요'
-      : 초록 ? '지금 바로!' : '초록이 되기 전에 누르면 1초로 기록됩니다'
+      : 초록 ? '지금 바로!' : '초록이 되기 전에 누르면 이번 판은 탈락이에요'
   }));
 }
 
@@ -70,13 +70,15 @@ function 신호판(el, view, 보내기) {
 function 쉬는중(el, view) {
   const 내기록 = view.내기록 || [];
   if (내기록.length) {
+    const 합계 = 내기록.reduce((a, x) => a + (x.점 || 0), 0);
     const box = 요소('div', { class: 'rt-내기록' }, [
-      요소('span', { class: 'rt-내기록말', text: '내 기록' })
+      요소('span', { class: 'rt-내기록말', text: `내 점수 ${합계}점` })
     ]);
-    for (const ms of 내기록) {
+    // 판마다 한 칸 — 기록과 그 판에 받은 점수
+    for (const x of 내기록) {
       box.appendChild(요소('span', {
-        class: 'rt-내칸' + (ms >= 1000 ? ' 나쁨' : ''),
-        text: `${ms}ms`
+        class: 'rt-내칸' + (x.점 ? '' : ' 나쁨'),
+        text: x.ms == null ? '탈락' : `${x.ms}ms +${x.점}`
       }));
     }
     el.appendChild(box);
