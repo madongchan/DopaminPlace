@@ -3,9 +3,9 @@
 // 누가 라이어인지도 투표로 지목되기 전까지는 서버가 보내주지 않는다. 여기서 숨기는 게 아니다.
 import { 요소, 비우기, 타이머붙이기, 타이머띠 } from '/js/components.js';
 
-const 단계길이 = { 설명: 20, 토론: 60, 투표: 30, 맞히기: 20 };
+const 단계길이 = { 확인: 10, 설명: 20, 토론: 60, 투표: 30, 맞히기: 20 };
 // 한 판이 흘러가는 순서. 위쪽에 늘 띄워 지금 어디인지 보이게 한다.
-const 흐름 = [['설명', '설명'], ['토론', '토론'], ['투표', '투표'], ['맞히기', '라이어의 반격']];
+const 흐름 = [['확인', '제시어 확인'], ['설명', '설명'], ['토론', '토론'], ['투표', '투표'], ['맞히기', '라이어의 반격']];
 
 export function 그리기(el, { view, name }) {
   비우기(el);
@@ -20,18 +20,15 @@ export function 그리기(el, { view, name }) {
   el.appendChild(요소('div', { class: 'mf-흐름' }, 흐름.map(([id, 글]) =>
     요소('span', { class: 'mf-흐름칸' + (id === view.phase ? ' 지금' : ''), text: 글 }))));
 
-  el.appendChild(요소('div', { class: 'lr-카테고리' }, [
-    요소('span', { class: 'lr-카테고리말', text: '카테고리' }),
-    요소('span', { class: 'lr-카테고리글', text: view.카테고리 || '' })
-  ]));
-
   const 숫자 = 요소('div', { class: 'tp-초' });
   const 띠 = 요소('div', { class: 'tp-띠' });
   el.appendChild(요소('div', { class: 'tp-타이머' }, [숫자, 띠]));
   타이머붙이기(숫자, view.endsAt);
   타이머띠(띠, view.endsAt, 단계길이[view.phase] || 30);
 
-  if (view.phase === '설명') 설명(el, view);
+  if (view.phase === '확인') {
+    el.appendChild(요소('div', { class: 'tp-안내', text: '휴대폰에서 내 제시어를 확인하세요 — 카드를 꾹 누르면 보입니다' }));
+  } else if (view.phase === '설명') 설명(el, view);
   else if (view.phase === '토론') {
     el.appendChild(요소('div', { class: 'tp-안내', text: '자유 토론 — 누가 라이어일까요?' }));
   } else if (view.phase === '투표') {

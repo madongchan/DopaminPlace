@@ -710,9 +710,6 @@ body { overflow: hidden; height: 100vh; }
 /* ══════════════════════════════════════════════════════════
    라이어 게임 — 큰 화면
    ══════════════════════════════════════════════════════════ */
-.lr-카테고리 { display: flex; align-items: baseline; justify-content: center; gap: 18px; }
-.lr-카테고리말 { font-size: 26px; color: var(--text-dim); }
-.lr-카테고리글 { font-size: 64px; color: var(--ppt-gold); }
 .mf-사람.lr-끝 { opacity: .45; }
 .mf-사람.lr-지금 { border-color: var(--ppt-gold); }
 .mf-사람.lr-지금 .mf-사람이름 { color: var(--ppt-gold); }

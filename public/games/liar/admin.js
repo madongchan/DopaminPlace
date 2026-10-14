@@ -3,7 +3,7 @@
 // 시간이 되면 서버가 알아서 넘기므로, 버튼은 빨리 넘기고 싶을 때만 누르면 된다.
 import { 요소, 비우기, 타이머붙이기 } from '/js/components.js';
 
-const 단계글 = { 설명: '설명', 토론: '토론', 투표: '투표', 맞히기: '라이어가 제시어를 맞히는 중', 판끝: '판 결과', 끝: '끝' };
+const 단계글 = { 확인: '제시어 확인 (10초)', 설명: '설명', 토론: '토론', 투표: '투표', 맞히기: '라이어가 제시어를 맞히는 중', 판끝: '판 결과', 끝: '끝' };
 
 export function 그리기(el, current, 조작) {
   const view = current.view;
@@ -12,7 +12,7 @@ export function 그리기(el, current, 조작) {
   const 숫자 = 요소('span', { class: 'a-초' });
   el.appendChild(요소('div', { class: 'a-g머리' }, [
     요소('span', { class: 'a-g라운드', text: `${view.round}/${view.총라운드}판` }),
-    요소('span', { class: 'a-g제시어', text: `${단계글[view.phase] || view.phase} · 카테고리 ${view.카테고리 || ''}` }),
+    요소('span', { class: 'a-g제시어', text: 단계글[view.phase] || view.phase }),
     숫자
   ]));
   if (view.endsAt) 타이머붙이기(숫자, view.endsAt);
@@ -24,7 +24,10 @@ export function 그리기(el, current, 조작) {
   const 버튼 = (글, action, payload, 모양 = 'sm') => 버튼들.appendChild(
     요소('button', { class: 모양, text: 글, onclick: () => 조작(action, payload) }));
 
-  if (view.phase === '설명') {
+  if (view.phase === '확인') {
+    줄('지금', '모두 휴대폰에서 제시어를 확인하는 중 — 10초 뒤 설명이 시작됩니다');
+    버튼('바로 설명 시작', '다음');
+  } else if (view.phase === '설명') {
     줄('지금 설명', `${view.발언자 || ''} (${view.발언번호 + 1}/${(view.순서 || []).length})`);
     버튼('다음 사람으로', '다음');
   } else if (view.phase === '토론') {

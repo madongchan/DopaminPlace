@@ -13,7 +13,7 @@ export function 그리기(el, current, 보내기) {
 
   el.appendChild(요소('div', {
     class: 'p-라운드',
-    text: `${view.round} / ${view.총라운드} 판 · 카테고리 ${view.카테고리 || ''}`
+    text: `${view.round} / ${view.총라운드} 판`
   }));
 
   if (view.phase === '판끝' || view.phase === '끝') { 결과(el, view); return; }
@@ -26,7 +26,10 @@ export function 그리기(el, current, 보내기) {
     타이머붙이기(숫자, view.endsAt);
   }
 
-  if (view.phase === '설명') {
+  if (view.phase === '확인') {
+    el.appendChild(요소('div', { class: 'mf-할일', text: '내 제시어를 확인하세요' }));
+    el.appendChild(요소('p', { class: 'sub', text: '위 카드를 꾹 누르면 보입니다. 10초 뒤 설명이 시작됩니다.' }));
+  } else if (view.phase === '설명') {
     el.appendChild(요소('div', {
       class: 'mf-할일',
       text: view.내차례 ? '내 차례! 한 문장으로 설명하세요' : `${view.발언자 || ''} 님이 설명하는 중`

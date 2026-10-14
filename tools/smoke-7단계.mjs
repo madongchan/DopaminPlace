@@ -60,7 +60,8 @@ console.log('\n[라이어 게임 — 비밀이 새지 않는가]');
     v.player(시민id).내가라이어 === false && !JSON.stringify(v.player(시민id)).includes('"라이어"'));
   확인('스포일러(adminSecret)에만 라이어와 제시어가 있다',
     v.adminSecret.라이어 === 라이어이름 && v.adminSecret.제시어 === '복숭아');
-  확인('카테고리는 모두에게 보인다', v.screen.카테고리 === '과일');
+  확인('카테고리는 아무에게도 안 보인다',
+    ![v.screen, v.admin, v.player(라이어id), v.player(시민id)].some(x => JSON.stringify(x).includes('과일')));
 }
 
 // ══════════════════════════════════════════════════════════
@@ -71,7 +72,11 @@ console.log('\n[라이어 게임 — 진행: 설명 → 토론 → 투표]');
   const 라이어id = 비밀읽기(s.playId).라이어들[0];
   const 시민들 = 사람들.map(x => x[0]).filter(id => id !== 라이어id);
 
-  확인('설명으로 시작한다', s.phase === '설명' && s.순서.length === 5, `순서 ${s.순서.length}명`);
+  확인('제시어 확인 10초로 시작한다', s.phase === '확인' && s.endsAt - Date.now() <= 10000 && s.순서.length === 5,
+    `${s.phase} · 순서 ${s.순서.length}명`);
+  확인('확인 중에도 시민 휴대폰에는 제시어가 있다', liar.views(s).player(시민들[0]).제시어 === '복숭아');
+  liar.onTick(s, s.endsAt + 1);                          // 10초가 지나면 설명으로
+  확인('10초 뒤 설명으로 넘어간다', s.phase === '설명' && s.발언번호 === 0, s.phase);
   const 첫발언 = s.순서[0];
   확인('내 차례는 발언자 본인에게만 보인다',
     liar.views(s).player(첫발언).내차례 === true && liar.views(s).player(s.순서[1]).내차례 === false);
@@ -134,7 +139,7 @@ console.log('\n[라이어 게임 — 라이어가 이기는 경우]');
   const s = 판만들기('테스트-라이어-3'); 쓴판.push(s.playId);
   const 라이어id = 비밀읽기(s.playId).라이어들[0];
   const 시민들 = 사람들.map(x => x[0]).filter(id => id !== 라이어id);
-  for (let i = 0; i < 6; i++) liar.onAdmin(s, { action: '다음' });     // 설명 5명 + 토론
+  for (let i = 0; i < 7; i++) liar.onAdmin(s, { action: '다음' });     // 제시어 확인 + 설명 5명 + 토론
   // 표가 갈려 동률 — 라이어를 못 잡는다
   liar.onInput(s, 시민들[0], { act: '투표', target: 라이어id });
   liar.onInput(s, 시민들[1], { act: '투표', target: 시민들[0] });
@@ -145,7 +150,7 @@ console.log('\n[라이어 게임 — 라이어가 이기는 경우]');
   const s2 = 판만들기('테스트-라이어-4'); 쓴판.push(s2.playId);
   const 라2 = 비밀읽기(s2.playId).라이어들[0];
   const 시2 = 사람들.map(x => x[0]).filter(id => id !== 라2);
-  for (let i = 0; i < 6; i++) liar.onAdmin(s2, { action: '다음' });
+  for (let i = 0; i < 7; i++) liar.onAdmin(s2, { action: '다음' });    // 제시어 확인 + 설명 5명 + 토론
   for (const id of 시2) liar.onInput(s2, id, { act: '투표', target: 라2 });
   liar.onInput(s2, 라2, { act: '투표', target: 시2[0] });
   liar.onInput(s2, 라2, { act: '맞히기', answer: ' 복 숭 아 ' });
@@ -166,8 +171,9 @@ console.log('\n[개인전 전용 게임은 팀 점수에 안 들어간다]');
   const 판 = 점수판('total');
   const 개인 = Object.fromEntries(판.개인.map(p => [p.id, p.points]));
   const 팀 = Object.fromEntries(판.팀.map(t => [t.id, t.points]));
-  확인('마피아·라이어가 개인전 전용으로 표시돼 있다',
-    게임목록.filter(g => g.개인전만).map(g => g.id).sort().join(',') === 'liar,mafia');
+  확인('개인전은 모두 개인전 전용(팀 점수 제외)으로 표시돼 있다',
+    게임목록.filter(g => g.개인전만).map(g => g.id).sort().join(',') === 'liar,mafia,nunchi,reaction'
+    && 게임목록.filter(g => g.type === 'solo').every(g => g.개인전만));
   확인('개인 점수에는 마피아·라이어 점수가 들어간다', 개인.b === 14, `나래 ${개인.b}점`);
   확인('팀 점수에는 마피아·라이어 점수가 안 들어간다', 팀.B === 0, `그린 ${팀.B}점`);
   확인('팀전 점수는 그대로 팀 점수가 된다', 팀.A === 5, `핑크 ${팀.A}점`);

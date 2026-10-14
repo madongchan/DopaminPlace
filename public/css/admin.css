@@ -212,10 +212,10 @@ button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt
 /* ── 반응속도 ──────────────────────────────────────────── */
 .a-rt순위 { margin: 12px 0; }
 .a-rt줄 {
-  display: flex; justify-content: space-between; gap: 10px;
+  display: flex; justify-content: space-between; gap: 10px; max-width: 360px;   /* 넓은 화면에서 점수가 오른쪽 끝으로 멀어지지 않게 */
   padding: 5px 0; border-bottom: 1px solid var(--line); font-size: 14px;
 }
-.a-rt줄 b { font-variant-numeric: tabular-nums; }
+.a-rt줄 b { font-variant-numeric: tabular-nums; color: var(--ppt-gold); }
 
 /* ── 초성 퀴즈 ─────────────────────────────────────────── */
 .a-cs맞힌 { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0; }
