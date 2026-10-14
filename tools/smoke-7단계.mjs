@@ -188,19 +188,17 @@ console.log('\n[연습 문제는 진짜 문제와 겹치지 않는다]');
 }
 
 // ══════════════════════════════════════════════════════════
-console.log('\n[끈끈이 동전잡기 — 진행자가 등수만 입력]');
+console.log('\n[끈끈이 동전잡기 — 진행자가 1등 팀만 입력]');
 {
   const { default: coin } = await import('../server/games/coin/index.js');
   참가자세팅([['a', '가람', 'A'], ['b', '나래', 'A'], ['c', '다온', 'B'], ['e', '마루', 'C']]);
   const s = coin.create();
-  coin.onAdmin(s, { action: '등수', payload: { teamId: 'B' } });
-  coin.onAdmin(s, { action: '등수', payload: { teamId: 'B' } });      // 같은 팀을 두 번
-  확인('같은 팀은 한 번만 들어간다', s.순위.join('') === 'B');
-  coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });
-  coin.onAdmin(s, { action: '되돌리기' });
-  확인('되돌리면 마지막 입력이 빠진다', s.순위.join('') === 'B' && coin.views(s).admin.남은팀.join('') === 'AC');
   coin.onAdmin(s, { action: '등수', payload: { teamId: 'A' } });
-  coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'C' } });      // 1등은 하나만 — 두 번째는 무시
+  확인('1등 팀은 하나만 고른다', s.순위.join('') === 'A', s.순위.join(''));
+  coin.onAdmin(s, { action: '되돌리기' });
+  확인('되돌리면 다시 고를 수 있다', s.순위.length === 0 && coin.views(s).admin.남은팀.join('') === 'ABC');
+  coin.onAdmin(s, { action: '등수', payload: { teamId: 'B' } });
   const 점 = Object.fromEntries(coin.result(s).점수.map(x => [x.playerId, x.points]));
   확인('1등 팀원만 +5 · 2·3등은 0', 점.c === 5 && !점.a && !점.b && !점.e,
     `다온 ${점.c} · 가람 ${점.a} · 나래 ${점.b} · 마루 ${점.e}`);

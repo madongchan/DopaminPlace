@@ -3,7 +3,7 @@
 // 인트로(js/intro.js)는 screen.html에서 따로 싣는다.
 // 모듈 스크립트는 서로 독립이라 인트로가 죽어도 이 파일은 계속 돈다.
 
-import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자 } from '/js/components.js';
+import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자, 배점칩들 } from '/js/components.js';
 
 const socket = io();
 const $ = (id) => document.getElementById(id);
@@ -247,6 +247,7 @@ function 보드그리기(view) {
         요소('span', { class: 'b-뱃지', text: `${b.minutes}분` })
       ]),
       요소('div', { class: 'b-이름', text: b.name, style: { color: b.color } }),
+      배점칩들(b.배점),
       요소('div', {
         class: 'b-상태',
         text: b.인원부족 ? `${b.minPlayers}명 이상 필요`

@@ -119,6 +119,26 @@ button.on { background: var(--ppt-gold); color: #05102E; border-color: var(--ppt
 .a-블록이름 { font-size: 18px; font-weight: 900; }
 .a-블록메타 { font-size: 12px; color: var(--text-dim); font-weight: 700; }
 .a-블록결과 { font-size: 12px; color: var(--ppt-gold); font-weight: 800; }
+.a-블록 .배점 { font-size: 13px; margin-top: 6px; }
+/* 「점수 2배」 켜고 끄는 스위치 */
+.두배스위치 {
+  display: inline-flex; align-items: center; gap: 12px;
+  min-height: 56px; padding: 8px 18px; border-radius: 999px;
+  background: var(--bg-2); border: 2px solid var(--line-2); color: var(--text-dim);
+  font-size: 18px; font-weight: 900; cursor: pointer;
+}
+.두배스위치-틀 {
+  position: relative; width: 58px; height: 32px; border-radius: 999px;
+  background: #4A5068; transition: background .15s;
+}
+.두배스위치-손 {
+  position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%;
+  background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.4); transition: left .15s;
+}
+.두배스위치-상태 { min-width: 2.6em; text-align: left; letter-spacing: .06em; }
+.두배스위치.켜짐 { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 18px -4px var(--gold); }
+.두배스위치.켜짐 .두배스위치-틀 { background: var(--gold); }
+.두배스위치.켜짐 .두배스위치-손 { left: 30px; }
 
 .a-점수판 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 14px; }
 .a-점수칸 h3 { margin: 0 0 10px; font-size: 14px; color: var(--text-dim); }

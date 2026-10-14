@@ -121,6 +121,30 @@ body::after {
 .점수표-점 { color: var(--ppt-gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .점수표-덧 { font-size: .78em; color: var(--text-dim); font-weight: 600; }
 
+/* ── 배점 칩 (보드 칸·규칙 카드 공통). em 이라 놓인 곳의 글자 크기를 따른다. ── */
+.배점 { display: flex; flex-wrap: wrap; align-items: center; gap: .35em .45em; }
+.배점칩 {
+  display: inline-flex; align-items: center; gap: .3em;
+  padding: .18em .55em .18em .22em; border-radius: 999px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+  font-weight: 800; white-space: nowrap; line-height: 1.2;
+}
+.배점칩:not(:has(.메달)) { padding-left: .6em; }
+.메달 {
+  display: inline-grid; place-items: center; width: 1.35em; height: 1.35em; border-radius: 50%;
+  font-size: .85em; font-weight: 900; color: #1a1400;
+}
+.메달1 { background: linear-gradient(#FFE27A, #E2BE27); }
+.메달2 { background: linear-gradient(#F1F3F7, #AEB6C4); }
+.메달3 { background: linear-gradient(#F0B98A, #B9733F); }
+.배점글 { font-size: .85em; color: var(--text-dim); font-weight: 700; }
+.배점점 { color: var(--ppt-gold); font-size: 1.15em; font-variant-numeric: tabular-nums; }
+.배점두배 {
+  padding: .15em .55em; border-radius: 999px; background: var(--gold); color: #1a1400;
+  font-size: .8em; font-weight: 900;
+}
+.점수표 > .배점 { font-size: 1.05em; margin: .2em 0 .3em; }
+
 .neon { color: var(--gold); }
 .dim  { color: var(--text-dim); }
 .mono { font-variant-numeric: tabular-nums; letter-spacing: .06em; }

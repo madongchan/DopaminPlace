@@ -98,7 +98,7 @@ function 게임고르기(gameId) {
   const g = 게임찾기(gameId);
   if (!g) return { ok: false, error: '없는 게임이에요.' };
   if (state.current) return { ok: false, error: '이미 진행 중인 게임이 있어요.' };
-  state.current = { gameId, playId: null, phase: 'rules', gameState: null, 두배: 자동2배(g) };
+  state.current = { gameId, playId: null, phase: 'rules', gameState: null, 두배: false };
   // TV에 팀 소개를 띄워 둔 채였다면 규칙 카드가 끝난 뒤 보드로 돌아오게 한다.
   if (state.settings.bigScreen === 'teams') state.settings.bigScreen = 'auto';
   저장();
@@ -144,15 +144,16 @@ function 게임취소() {
   return { ok: true };
 }
 
-// 자동 「점수 2배」 — 세 번째로 하는 팀전부터 점수를 2배로 준다(2026-10-15 담당자 결정).
-// 팀전이 1등 팀만 +5라 같은 팀이 앞의 두 판을 이기면 마지막 팀전 전에 1등이 확정된다(시뮬레이션 33%).
-// 2배(+10)면 10%로 줄어든다. 진행자가 켜는 게 아니라 끝낸 팀전 판 수로 정해서 순서를 바꿔도 그대로 맞다.
-function 자동2배(g) {
-  if (g.type === 'solo') return false;
-  const 끝낸팀전 = 게임목록
-    .filter(x => x.type !== 'solo')
-    .reduce((합, x) => 합 + (state.board.games[x.id]?.playsCount || 0), 0);
-  return 끝낸팀전 >= 2;
+// 「점수 2배」 — 진행자가 게임마다 켜고 끈다(2026-10-15 담당자 결정, 자동 방식에서 바꿈).
+// 마지막 팀전에 켜면 1등이 미리 확정되는 경우가 33% → 10%로 준다(시뮬레이션). 켜면 TV·휴대폰에 띠가 뜬다.
+// 끝내고 점수를 줄 때 그 판 점수를 두 배로 기록한다.
+function 점수2배(켜기) {
+  const c = state.current;
+  if (!c) return { ok: false, error: '진행 중인 게임이 없어요.' };
+  if (c.연습) return { ok: false, error: '연습 판에는 점수가 없어요.' };
+  c.두배 = !!켜기;
+  저장();
+  return { ok: true };
 }
 
 // 게임을 끝내고 점수를 반영한다.
@@ -264,6 +265,7 @@ function 현재게임뷰(등급, playerId = null) {
     두배: !!c.두배,                 // 진행자가 켠 「점수 2배」 판인가
     rules: g.rules,
     점수표: g.점수표 || [],         // 무엇을 하면 몇 점인지 — 규칙 카드에 보여준다
+    배점: g.배점 || [],             // 그림으로 보이는 배점 요약
     개인전만: !!g.개인전만
   };
   if (c.phase !== 'playing' || !c.gameState) return 기본;
@@ -549,6 +551,7 @@ io.on('connection', (socket) => {
       case '게임취소':    r = 게임취소(); break;
       case '게임끝내기':  r = 게임끝내기({ 점수반영: true }); break;
       case '게임중단':    r = 게임끝내기({ 점수반영: false }); break;
+      case '점수2배':     r = 점수2배(d.켜기); break;
 
       case '게임조작': {
         // 게임 안쪽 진행(다음 라운드, 답 병합 등)은 그 게임 모듈이 처리한다.

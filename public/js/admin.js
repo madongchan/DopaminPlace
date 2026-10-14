@@ -1,6 +1,6 @@
 // 진행자 화면 — PIN 로그인, 단계별 진행(입장 → 팀 → 게임), 세부 관리.
 // 모든 조작은 서버로 보내고, 화면은 서버가 돌려준 뷰를 그린다.
-import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자 } from '/js/components.js';
+import { 요소, 비우기, 순위막대, 팀사전, 팀색, 규칙줄, 점수표상자, 배점칩들 } from '/js/components.js';
 
 const socket = io();
 const $ = (id) => document.getElementById(id);
@@ -213,6 +213,7 @@ function 보드그리기(v) {
     }, [
       요소('span', { class: 'a-블록이름', text: b.name, style: { color: b.color } }),
       요소('span', { class: 'a-블록메타', text: `${종류글[b.type] || b.type} · ${b.minutes}분 · ${b.playsCount}회` }),
+      배점칩들(b.배점),
       b.lastResult ? 요소('span', { class: 'a-블록결과', text: b.lastResult }) : null
     ]));
   }
@@ -261,8 +262,7 @@ async function 게임그리기(v) {
   $('game-title').textContent = `③ ${c.name} — ${c.phase === 'rules' ? '규칙 카드' : (c.연습 ? '연습 중' : '진행 중')}${c.두배 ? ' · 점수 2배' : ''}`;
 
   if (c.phase === 'rules') {
-    $('s3-guide').textContent = (c.두배 ? '세 번째 팀전이라 자동으로 점수 2배입니다(TV에 표시). ' : '')
-      + '규칙을 읽어준 뒤 시작을 누르세요. 처음 하는 게임이면 연습으로 한 판 해보세요(점수가 남지 않습니다).';
+    $('s3-guide').textContent = '규칙을 읽어준 뒤 시작을 누르세요. 처음 하는 게임이면 연습으로 한 판 해보세요(점수가 남지 않습니다).';
     const ul = 요소('ul', { class: 'a-규칙' });
     for (const r of c.rules || []) ul.appendChild(규칙줄(r));
     body.appendChild(ul);
@@ -273,6 +273,7 @@ async function 게임그리기(v) {
       class: 'a-큰버튼 둘째', text: '연습으로 시작',
       onclick: () => 보내기('게임시작', { 옵션: { 연습: true } }, '연습 판을 시작했습니다. 점수는 남지 않아요.')
     }));
+    btns.appendChild(두배버튼(c));
     btns.appendChild(요소('button', {
       class: 'ghost', text: '취소',
       onclick: () => { if (confirm('이 게임을 취소하고 보드로 돌아갑니다. 계속할까요?')) 보내기('게임취소', {}, '보드로 돌아갔습니다.'); }
@@ -304,6 +305,7 @@ async function 게임그리기(v) {
     }));
     return;
   }
+  btns.appendChild(두배버튼(c));
   btns.appendChild(요소('button', {
     class: 'sm', text: '끝내고 점수 주기',
     onclick: () => { if (confirm(`게임을 끝내고 점수를 반영합니다${c.두배 ? ' (점수 2배)' : ''}. 계속할까요?`)) 보내기('게임끝내기', {}, '점수를 반영했습니다.'); }
@@ -312,6 +314,23 @@ async function 게임그리기(v) {
     class: 'sm danger', text: '중단 (점수 없음)',
     onclick: () => { if (confirm('점수 없이 중단합니다. 되돌릴 수 없어요. 계속할까요?')) 보내기('게임중단', {}, '게임을 중단했습니다.'); }
   }));
+}
+
+// 「점수 2배」 켜기·끄기 — 누르면 TV·휴대폰에 「점수 2배 판」 띠가 뜨고 규칙 카드 배점이 두 배로 보인다.
+// 끝내고 점수를 줄 때 이 판 점수가 두 배로 기록된다. (연습 판에는 없다)
+// 생김새는 켜고 끄는 스위치 — 켜짐(ON)은 금색 바탕에 손잡이가 오른쪽, 꺼짐(OFF)은 회색에 왼쪽.
+function 두배버튼(c) {
+  return 요소('button', {
+    class: '두배스위치' + (c.두배 ? ' 켜짐' : ''),
+    role: 'switch', 'aria-checked': c.두배 ? 'true' : 'false',
+    title: c.두배 ? '누르면 점수 2배를 끕니다' : '누르면 이번 판 점수가 2배가 되고 TV에 표시됩니다',
+    onclick: () => 보내기('점수2배', { 켜기: !c.두배 },
+      c.두배 ? '점수 2배를 껐습니다.' : '이번 판은 점수 2배입니다. TV에 표시됐어요.')
+  }, [
+    요소('span', { class: '두배스위치-글', text: '점수 2배' }),
+    요소('span', { class: '두배스위치-틀' }, [요소('span', { class: '두배스위치-손' })]),
+    요소('b', { class: '두배스위치-상태', text: c.두배 ? 'ON' : 'OFF' })
+  ]);
 }
 
 function 참가자그리기(v) {

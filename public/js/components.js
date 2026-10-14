@@ -134,15 +134,36 @@ export function 규칙줄(글) {
   return 요소('li', {}, [요소('b', { class: '규칙머리', text: 글.slice(0, i) }), 글.slice(i + 3)]);
 }
 
-// 점수표 — 무엇을 하면 몇 점인지 한눈에. c: 서버가 준 current (점수표·개인전만·type)
+// ── 배점 칩 (보드 칸·규칙 카드 공통) ───────────────────────
+// 배점: [{ 메달?: 1|2|3, 글?: '1등 팀 전원', 점: 5, 덧?: '씩' }] — 게임 모듈의 `배점`.
+// 메달은 금·은·동 동그라미 숫자로, 점수는 크게 보여 읽지 않고 한눈에 보이게 한다.
+// 배 = 2 면 점수를 두 배로 적고 「2배」 표시를 붙인다(세 번째 팀전 자동 2배).
+export function 배점칩들(배점 = [], 배 = 1) {
+  if (!배점.length) return null;
+  const box = 요소('div', { class: '배점' });
+  for (const x of 배점) {
+    box.appendChild(요소('span', { class: '배점칩' }, [
+      x.메달 ? 요소('span', { class: `메달 메달${x.메달}`, text: String(x.메달) }) : null,
+      x.글 ? 요소('span', { class: '배점글', text: x.글 }) : null,
+      요소('b', { class: '배점점', text: `+${x.점 * 배}${x.덧 || ''}` })
+    ]));
+  }
+  if (배 > 1) box.appendChild(요소('span', { class: '배점두배', text: `${배}배` }));
+  return box;
+}
+
+// 점수표 — 무엇을 하면 몇 점인지 한눈에. c: 서버가 준 current (배점·점수표·개인전만·type·두배)
 export function 점수표상자(c) {
   const 표 = c?.점수표 || [];
-  if (!표.length) return null;
+  if (!표.length && !(c?.배점 || []).length) return null;
   const box = 요소('div', { class: '점수표' }, [요소('div', { class: '점수표-제목', text: '점수' })]);
+  // 맨 위에 한눈에 보는 배점, 그 아래에 자세한 줄
+  const 칩 = 배점칩들(c.배점, c.두배 ? 2 : 1);
+  if (칩) box.appendChild(칩);
   for (const [무엇, 몇점] of 표) {
     box.appendChild(요소('div', { class: '점수표-줄' }, [
       요소('span', { class: '점수표-무엇', text: 무엇 }),
-      요소('b', { class: '점수표-점', text: 몇점 })
+      몇점 ? 요소('b', { class: '점수표-점', text: 몇점 }) : null
     ]));
   }
   box.appendChild(요소('div', {
