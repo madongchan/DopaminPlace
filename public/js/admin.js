@@ -246,6 +246,7 @@ function 점수판그리기(v) {
 
 // ── 진행 중인 게임 ──────────────────────────────────────────
 let 게임모듈 = null, 게임모듈id = null;
+let 마피아수 = 0;     // 마피아 규칙 카드에서 고른 수 (0 = 자동)
 
 async function 게임그리기(v) {
   const c = v.current;
@@ -268,10 +269,19 @@ async function 게임그리기(v) {
     body.appendChild(ul);
     const 점수표 = 점수표상자(c);
     if (점수표) body.appendChild(점수표);
-    btns.appendChild(요소('button', { class: 'a-큰버튼', text: '시작', onclick: () => 보내기('게임시작', {}, '게임을 시작했습니다.') }));
+    // 마피아만 — 마피아 수를 고른다. 0 = 인원에 맞게 자동 (서버가 인원보다 많으면 줄인다)
+    const 마피아옵션 = () => (c.gameId === 'mafia' ? { 마피아수 } : {});
+    if (c.gameId === 'mafia') {
+      const 고르기 = 요소('select', { onchange: e => { 마피아수 = Number(e.target.value); } });
+      for (const [값, 글] of [[0, '자동 (인원에 맞게)'], [1, '1명'], [2, '2명'], [3, '3명']]) {
+        고르기.appendChild(요소('option', { value: 값, text: 글, selected: 마피아수 === 값 }));
+      }
+      body.appendChild(요소('label', { class: 'a-미제출' }, [요소('span', { class: 'a-라벨', text: '마피아 수' }), 고르기]));
+    }
+    btns.appendChild(요소('button', { class: 'a-큰버튼', text: '시작', onclick: () => 보내기('게임시작', { 옵션: 마피아옵션() }, '게임을 시작했습니다.') }));
     btns.appendChild(요소('button', {
       class: 'a-큰버튼 둘째', text: '연습으로 시작',
-      onclick: () => 보내기('게임시작', { 옵션: { 연습: true } }, '연습 판을 시작했습니다. 점수는 남지 않아요.')
+      onclick: () => 보내기('게임시작', { 옵션: { ...마피아옵션(), 연습: true } }, '연습 판을 시작했습니다. 점수는 남지 않아요.')
     }));
     btns.appendChild(두배버튼(c));
     btns.appendChild(요소('button', {

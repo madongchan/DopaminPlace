@@ -64,7 +64,8 @@ export default {
   create(ctx) {
     const playId = ctx?.playId || `임시-${Date.now()}`;
     const 사람들 = Object.values(ctx?.players || state.players);
-    const { 역할: 역할맵, 마피아들 } = 역할나누기(사람들);
+    // 진행자가 규칙 카드에서 고른 마피아 수 (0이면 인원표대로 자동)
+    const { 역할: 역할맵, 마피아들 } = 역할나누기(사람들, Number(ctx?.settings?.마피아수) || 0);
 
     // 역할뿐 아니라 '누가 그 역할인지 드러나는 것'은 전부 secret.json 에만 쓴다 (SPEC 5-5).
     // 경찰기록·군인방패·군인알림·점수메모는 참가자 id 로 묶여 있어서
@@ -311,8 +312,10 @@ function 역할구성(n) {
   return { 마피아: Math.max(1, Math.floor(n / 4)), 경찰: 1, 의사: 1, 군인: n >= 6 ? 1 : 0 };
 }
 
-function 역할나누기(사람들) {
+function 역할나누기(사람들, 마피아수 = 0) {
   const 구성 = 역할구성(사람들.length);
+  // 진행자가 고른 수. 마피아가 나머지보다 적어야 게임이 되므로 (n-1)/2 까지만 허락한다.
+  if (마피아수 > 0) 구성.마피아 = Math.min(마피아수, Math.max(1, Math.floor((사람들.length - 1) / 2)));
   const 역할맵 = {};
 
   // 마피아는 가능한 한 서로 다른 팀에서 뽑는다 (SPEC 5-5)
