@@ -247,6 +247,7 @@ function 점수판그리기(v) {
 // ── 진행 중인 게임 ──────────────────────────────────────────
 let 게임모듈 = null, 게임모듈id = null;
 let 마피아수 = 0;     // 마피아 규칙 카드에서 고른 수 (0 = 자동)
+let 진행자관전 = false; // 「진행자 참여 안 함」 — 켜고 시작하면 그 판 동안 진행자 화면에 비밀(역할·라이어)이 보인다
 
 async function 게임그리기(v) {
   const c = v.current;
@@ -270,7 +271,11 @@ async function 게임그리기(v) {
     const 점수표 = 점수표상자(c);
     if (점수표) body.appendChild(점수표);
     // 마피아만 — 마피아 수를 고른다. 0 = 인원에 맞게 자동 (서버가 인원보다 많으면 줄인다)
-    const 마피아옵션 = () => (c.gameId === 'mafia' ? { 마피아수 } : {});
+    const 시작옵션 = () => ({
+      ...(c.gameId === 'mafia' ? { 마피아수 } : {}),
+      ...(c.진행자관전가능 ? { 진행자관전 } : {})
+    });
+    if (c.진행자관전가능) body.appendChild(관전스위치(c, v));
     if (c.gameId === 'mafia') {
       const 고르기 = 요소('select', { onchange: e => { 마피아수 = Number(e.target.value); } });
       for (const [값, 글] of [[0, '자동 (인원에 맞게)'], [1, '1명'], [2, '2명'], [3, '3명']]) {
@@ -278,10 +283,10 @@ async function 게임그리기(v) {
       }
       body.appendChild(요소('label', { class: 'a-미제출' }, [요소('span', { class: 'a-라벨', text: '마피아 수' }), 고르기]));
     }
-    btns.appendChild(요소('button', { class: 'a-큰버튼', text: '시작', onclick: () => 보내기('게임시작', { 옵션: 마피아옵션() }, '게임을 시작했습니다.') }));
+    btns.appendChild(요소('button', { class: 'a-큰버튼', text: '시작', onclick: () => 보내기('게임시작', { 옵션: 시작옵션() }, '게임을 시작했습니다.') }));
     btns.appendChild(요소('button', {
       class: 'a-큰버튼 둘째', text: '연습으로 시작',
-      onclick: () => 보내기('게임시작', { 옵션: { ...마피아옵션(), 연습: true } }, '연습 판을 시작했습니다. 점수는 남지 않아요.')
+      onclick: () => 보내기('게임시작', { 옵션: { ...시작옵션(), 연습: true } }, '연습 판을 시작했습니다. 점수는 남지 않아요.')
     }));
     btns.appendChild(두배버튼(c));
     btns.appendChild(요소('button', {
@@ -324,6 +329,30 @@ async function 게임그리기(v) {
     class: 'sm danger', text: '중단 (점수 없음)',
     onclick: () => { if (confirm('점수 없이 중단합니다. 되돌릴 수 없어요. 계속할까요?')) 보내기('게임중단', {}, '게임을 중단했습니다.'); }
   }));
+}
+
+// 「진행자 참여 안 함」 — 마피아·라이어 규칙 카드에만 뜬다(모듈의 진행자관전가능).
+// 시작 전에만 바꿀 수 있다. 시작하면 서버가 그 판에 값을 묶어 두어 도중에 켜서 엿볼 수 없다.
+function 관전스위치(c, v) {
+  const 켜짐 = 진행자관전;
+  const 무엇 = c.gameId === 'liar' ? '라이어와 제시어가' : '누가 어떤 역할인지';
+  return 요소('div', {}, [
+    요소('button', {
+      class: '두배스위치' + (켜짐 ? ' 켜짐' : ''),
+      role: 'switch', 'aria-checked': 켜짐 ? 'true' : 'false',
+      onclick: () => { 진행자관전 = !켜짐; 게임그리기(v); }
+    }, [
+      요소('span', { class: '두배스위치-글', text: '진행자 참여 안 함' }),
+      요소('span', { class: '두배스위치-틀' }, [요소('span', { class: '두배스위치-손' })]),
+      요소('b', { class: '두배스위치-상태', text: 켜짐 ? 'ON' : 'OFF' })
+    ]),
+    요소('p', {
+      class: 'a-도움',
+      text: 켜짐
+        ? `진행자 화면에 ${무엇} 보입니다. TV·휴대폰에는 안 나옵니다. 진행자는 휴대폰으로 참가하지 마세요.`
+        : '진행자도 참가합니다. 진행자 화면에도 비밀이 안 보입니다.'
+    })
+  ]);
 }
 
 // 「점수 2배」 켜기·끄기 — 누르면 TV·휴대폰에 「점수 2배 판」 띠가 뜨고 규칙 카드 배점이 두 배로 보인다.

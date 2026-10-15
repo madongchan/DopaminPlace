@@ -1,6 +1,7 @@
 // 마피아 — 진행자
 //
 // 진행자도 참가자다. 그래서 이 화면에는 역할이 오지 않는다(서버가 안 보낸다).
+// 단, 규칙 카드에서 「진행자 참여 안 함」으로 시작한 판은 서버가 역할표를 보낸다.
 // 진행자가 하는 일은 셋뿐 — 잠시 멈추기, 다음 단계로 밀기, 중단하기.
 import { 요소, 비우기, 타이머붙이기, 팀사전, 팀글자색 } from '/js/components.js';
 
@@ -58,12 +59,16 @@ export function 그리기(el, current, 조작, 진행자뷰) {
   el.appendChild(요소('div', { class: 'a-미제출' }, [
     요소('span', { class: 'a-라벨', text: `생존 ${view.산사람수}명` })
   ]));
+  // 「진행자 참여 안 함」 판이면 이름 옆에 역할도 붙는다 (서버가 그 판에만 역할표를 보낸다).
+  // 역할표와 사람들은 서버에서 같은 명단 순서로 만든다.
   const 줄 = 요소('div', { class: 'a-nc순서' });
-  for (const p of view.사람들 || []) {
+  for (const [i, p] of (view.사람들 || []).entries()) {
+    const r = view.역할표?.[i]?.역할;
     줄.appendChild(요소('span', {
       class: 'a-nc칸' + (p.살아있나 ? '' : ' 탈락'),
-      text: p.name,
-      style: p.살아있나 ? { color: 팀글자색((팀[p.teamId] || {}).colorId) } : {}
+      text: r ? `${p.name} · ${r}` : p.name,
+      style: r === '마피아' ? { color: '#E5484D', fontWeight: '700' }
+        : p.살아있나 ? { color: 팀글자색((팀[p.teamId] || {}).colorId) } : {}
     }));
   }
   el.appendChild(줄);
@@ -97,7 +102,9 @@ export function 그리기(el, current, 조작, 진행자뷰) {
 
   el.appendChild(요소('p', {
     class: 'a-도움',
-    text: '진행자에게도 역할은 보이지 않습니다. 대표님도 참가자이기 때문입니다.'
+    text: view.진행자관전
+      ? '진행자 참여 안 함 판입니다. 역할은 진행자 화면에만 보이고 TV·휴대폰에는 나오지 않습니다.'
+      : '진행자에게도 역할은 보이지 않습니다. 진행자도 참가자이기 때문입니다.'
   }));
 }
 

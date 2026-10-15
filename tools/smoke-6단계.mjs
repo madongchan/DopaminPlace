@@ -26,7 +26,7 @@ const 원래참가자 = state.players;
 const 만든판 = [];
 let 판번호 = 0;
 
-function 판만들기(수 = 12) {
+function 판만들기(수 = 12, settings = {}) {
   state.players = {};
   const 팀들 = ['A', 'B', 'C'];
   for (let i = 0; i < 수; i++) {
@@ -38,7 +38,7 @@ function 판만들기(수 = 12) {
   판번호 += 1;
   const playId = `테스트-${Date.now()}-${판번호}`;
   만든판.push(playId);
-  const s = mafia.create({ playId, players: state.players });
+  const s = mafia.create({ playId, players: state.players, settings });
   const 비밀 = 비밀읽기(playId) || { 역할: {}, 마피아들: [] };
   return { s, playId, 역할: 비밀.역할, 마피아들: 비밀.마피아들 };
 }
@@ -449,6 +449,29 @@ console.log('\n[진행자 조작]');
   확인('강제로 다음 단계로 넘길 수 있다', s.phase === '아침', s.phase);
 
   비밀지우기(playId);
+}
+
+console.log('\n[진행자 참여 안 함 · 마피아 수]');
+{
+  const 끔 = 판만들기(10);
+  const v끔 = mafia.views(끔.s);
+  확인('기본(진행자 참여)이면 진행자 뷰에 역할이 없다', v끔.admin.역할표 === null && 새어나온역할(JSON.stringify(v끔.admin)).length === 0);
+  비밀지우기(끔.playId);
+
+  const 켬 = 판만들기(10, { 진행자관전: true });
+  const v켬 = mafia.views(켬.s);
+  확인('참여 안 함이면 진행자 뷰에 전원 역할이 있다',
+    v켬.admin.역할표?.length === 10 && v켬.admin.역할표.every((r, i) => r.역할 === 켬.역할[켬.s.명단[i]]));
+  확인('참여 안 함이어도 TV·휴대폰에는 역할이 없다',
+    새어나온역할(JSON.stringify(v켬.screen)).length === 0 && !('역할표' in v켬.screen));
+  비밀지우기(켬.playId);
+
+  const 둘 = 판만들기(11, { 마피아수: 2 });
+  확인('11명에 마피아 2명을 고르면 2명', 둘.마피아들.length === 2, `${둘.마피아들.length}명`);
+  비밀지우기(둘.playId);
+  const 적음 = 판만들기(4, { 마피아수: 3 });
+  확인('사람이 적으면 마피아가 나머지보다 적게 줄어든다', 적음.마피아들.length === 1, `${적음.마피아들.length}명`);
+  비밀지우기(적음.playId);
 }
 
 // ══════════════════════════════════════════════════════════

@@ -1,5 +1,6 @@
 // 라이어 게임 — 진행자
 // 진행자도 참가자다. 누가 라이어인지와 제시어는 판이 끝나기 전까지 여기 오지 않는다.
+// 단, 규칙 카드에서 「진행자 참여 안 함」으로 시작한 판은 서버가 정답(라이어·제시어)을 보낸다.
 // 시간이 되면 서버가 알아서 넘기므로, 버튼은 빨리 넘기고 싶을 때만 누르면 된다.
 import { 요소, 비우기, 타이머붙이기 } from '/js/components.js';
 
@@ -20,6 +21,8 @@ export function 그리기(el, current, 조작) {
   const 줄 = (라벨, 글) => el.appendChild(요소('div', { class: 'a-미제출' }, [
     요소('span', { class: 'a-라벨', text: 라벨 }), 요소('span', { text: 글 })
   ]));
+  // 「진행자 참여 안 함」 판에만 서버가 이번 판 정답을 보낸다
+  if (view.정답) 줄('이번 판 정답', `라이어 ${view.정답.라이어} · 제시어 ${view.정답.제시어}`);
   const 버튼들 = 요소('div', { class: 'rowbtns' });
   const 버튼 = (글, action, payload, 모양 = 'sm') => 버튼들.appendChild(
     요소('button', { class: 모양, text: 글, onclick: () => 조작(action, payload) }));

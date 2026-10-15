@@ -62,6 +62,15 @@ console.log('\n[라이어 게임 — 비밀이 새지 않는가]');
     v.adminSecret.라이어 === 라이어이름 && v.adminSecret.제시어 === '복숭아');
   확인('카테고리는 아무에게도 안 보인다',
     ![v.screen, v.admin, v.player(라이어id), v.player(시민id)].some(x => JSON.stringify(x).includes('과일')));
+
+  // 「진행자 참여 안 함」으로 시작한 판 — 진행자에게만 정답이 간다
+  const s2 = liar.create({ playId: '테스트-라이어-관전', players: state.players, content: { liar: 문제 }, settings: { 진행자관전: true } });
+  쓴판.push(s2.playId);
+  const v2 = liar.views(s2);
+  const 라2 = state.players[비밀읽기(s2.playId).라이어들[0]].name;
+  확인('참여 안 함이면 진행자 뷰에 라이어·제시어가 있다', v2.admin.정답?.라이어 === 라2 && v2.admin.정답?.제시어 === '복숭아');
+  확인('참여 안 함이어도 TV에는 제시어가 없다', !JSON.stringify(v2.screen).includes('복숭아'));
+  확인('기본(진행자 참여)이면 진행자 뷰에 정답이 없다', v.admin.정답 === null);
 }
 
 // ══════════════════════════════════════════════════════════
