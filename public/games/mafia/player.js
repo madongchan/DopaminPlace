@@ -101,19 +101,7 @@ function 밤(el, view, 보내기) {
     el.appendChild(box);
   }
 
-  // 경찰의 조사 결과
-  if (view.내조사 && view.내조사.length) {
-    const box = 요소('div', { class: 'mf-조사' }, [
-      요소('span', { class: 'mf-동료말', text: '내 조사 결과' })
-    ]);
-    for (const r of view.내조사) {
-      box.appendChild(요소('div', { class: 'mf-조사줄' + (r.마피아냐 ? ' 마피아' : '') }, [
-        요소('span', { text: `${r.day}일차 ${r.name}` }),
-        요소('b', { text: r.마피아냐 ? '마피아!' : '아님' })
-      ]));
-    }
-    el.appendChild(box);
-  }
+  조사결과(el, view);
 
   if (view.내역할 === '군인' && view.군인알림) {
     el.appendChild(요소('div', {
@@ -130,10 +118,27 @@ function 밤(el, view, 보내기) {
   el.appendChild(사람고르기(view, 지금고른것, (id) => 보내기({ act: '지목', target: id })));
 }
 
+// 경찰의 조사 결과 — 경찰 본인에게만 온다(서버가 남에게는 안 보낸다).
+// 밤에 조사하면 다음 아침부터 바로 보인다. 낮 토론·투표 때 참고하라고 밤 말고도 띄운다.
+function 조사결과(el, view) {
+  if (!view.내조사 || !view.내조사.length) return;
+  const box = 요소('div', { class: 'mf-조사' }, [
+    요소('span', { class: 'mf-동료말', text: '내 조사 결과' })
+  ]);
+  for (const r of view.내조사) {
+    box.appendChild(요소('div', { class: 'mf-조사줄' + (r.마피아냐 ? ' 마피아' : '') }, [
+      요소('span', { text: `${r.day}일차 ${r.name}` }),
+      요소('b', { text: r.마피아냐 ? '마피아!' : '아님' })
+    ]));
+  }
+  el.appendChild(box);
+}
+
 // ── 지목 투표 ───────────────────────────────────────────────
 function 지목투표(el, view, 보내기) {
   if (!view.내가살았나) { 기다리기(el, view); return; }
   el.appendChild(요소('div', { class: 'mf-할일', text: '처형할 사람을 지목하세요' }));
+  조사결과(el, view);
 
   const 고른사람 = (view.사람들 || []).find(p => p.id === view.내표);
   const 고른이름 = view.내표 === '기권' ? '기권' : (고른사람 ? 고른사람.name : null);
@@ -195,6 +200,7 @@ function 기다리기(el, view) {
     }));
   }
   el.appendChild(요소('div', { class: 'wait', text: 'TV 화면을 봐주세요' }));
+  조사결과(el, view);
 }
 
 // ── 끝 ──────────────────────────────────────────────────────
