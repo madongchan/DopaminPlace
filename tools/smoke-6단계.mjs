@@ -277,7 +277,20 @@ console.log('\n[낮 — 지목 투표와 처형]');
   확인('처형 결과가 화면에 나온다',
     mafia.views(s).screen.처형소식?.처형 === true,
     JSON.stringify(mafia.views(s).screen.처형소식));
+  확인('마피아가 처형되면 TV에 「마피아였습니다」', mafia.views(s).screen.처형소식?.마피아였나 === true);
 
+  비밀지우기(playId);
+}
+{
+  // 시민이 처형되면 역할을 말하지 않는다
+  const { s, playId, 역할 } = 판만들기(12);
+  const 시민 = s.명단.find(pid => 역할[pid] === '시민');
+  s.phase = '찬반투표'; s.최다득표 = 시민;
+  for (const pid of 산사람(s)) if (pid !== 시민) mafia.onInput(s, pid, { act: '찬반', 값: '찬성' });
+  const 소식 = mafia.views(s).screen.처형소식;
+  확인('시민이 처형되면 TV에 역할 표시가 없다',
+    s.생존[시민] === false && 소식?.처형 === true && !('마피아였나' in 소식) && 새어나온역할(JSON.stringify(소식)).length === 0,
+    JSON.stringify(소식));
   비밀지우기(playId);
 }
 
